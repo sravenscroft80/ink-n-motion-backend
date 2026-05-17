@@ -1,0 +1,35 @@
+# Ink-N-Motion API — Render Blueprint (production)
+# Deploy: connect this repository in the Render dashboard and set the
+# service root directory to `backend/` when using a monorepo layout.
+#
+# ─── Mandatory dashboard environment variables ───────────────────────────────
+# NODE_ENV=production
+# REPLICATE_API_TOKEN=<live r8_ production token from replicate.com/account>
+# REPLICATE_MODEL_VERSION=3f0457e4619daac51203dedb472816fd4a51f94f6345a385c5268f6dbf029ed
+#
+# Optional:
+# PORT — injected automatically by Render (do not hard-code in dashboard)
+# RUNWAY_API_KEY — reserved for future runway relay
+# ───────────────────────────────────────────────────────────────────────────
+
+services:
+  - type: web
+    name: ink-n-motion-api
+    runtime: node
+    repo: https://github.com/YOUR_ORG/INK-IN-MOTION_APP
+    plan: starter
+    region: oregon
+    # Monorepo: if this Blueprint lives at the repository root instead, set rootDir: backend
+    buildCommand: npm install
+    startCommand: node server.js
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: REPLICATE_API_TOKEN
+        sync: false
+      - key: REPLICATE_MODEL_VERSION
+        value: 3f0457e4619daac51203dedb472816fd4a51f94f6345a385c5268f6dbf029ed
+      - key: RUNWAY_API_KEY
+        sync: false

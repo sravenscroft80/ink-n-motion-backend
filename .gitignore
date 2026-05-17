@@ -1,0 +1,10 @@
+node_modules/
+.env
+.env.*
+!.env.example
+uploads/
+*.log
+
+# Keep Render blueprint and lockfile in version control for CI/CD
+!render.yaml
+!package-lock.json
