@@ -16,7 +16,7 @@ services:
   - type: web
     name: ink-n-motion-api
     runtime: node
-    repo: https://github.com/YOUR_ORG/INK-IN-MOTION_APP
+    repo: https://github.com/sravenscroft80/ink-n-motion-backend
     plan: starter
     region: oregon
     # Monorepo: if this Blueprint lives at the repository root instead, set rootDir: backend
