@@ -20,6 +20,7 @@ server.listen(PORT, () => {
     nodeEnv: process.env.NODE_ENV || 'development',
     basePath: '/v1',
     generateEndpoint: 'POST /v1/generate/video',
+    mockupEndpoint: 'POST /generate-mockup',
     healthEndpoint: 'GET /health',
     timeoutMs: REQUEST_TIMEOUT_MS,
     replicateLiveRelayEnabled: deploymentEnv.replicateLiveRelayEnabled,

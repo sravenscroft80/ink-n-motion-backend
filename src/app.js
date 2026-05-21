@@ -1,6 +1,7 @@
 const express = require('express');
 const multer = require('multer');
 const generateVideoRouter = require('./routes/generateVideo');
+const generateMockupRouter = require('./routes/generateMockup');
 const { MASK_DIR } = require('./services/tattooMaskEngine');
 const { logger } = require('./utils/logger');
 
@@ -33,6 +34,8 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(express.json({ limit: '64kb' }));
+
 app.get('/health', (_req, res) => {
   res.status(200).json({ status: 'ok', service: 'ink-n-motion-api' });
 });
@@ -40,7 +43,20 @@ app.get('/health', (_req, res) => {
 /** Public mask assets for the low-cost "Make it Sparkle" track. */
 app.use('/uploads/masks', express.static(MASK_DIR));
 
+app.use('/generate-mockup', generateMockupRouter);
+
 app.use('/v1/generate', generateVideoRouter);
+
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    logger.warn('Invalid JSON payload', { path: req.originalUrl });
+    return res.status(400).json({
+      error: 'bad_request',
+      message: 'Invalid JSON payload.',
+    });
+  }
+  return next(err);
+});
 
 app.use((err, req, res, _next) => {
   if (err instanceof multer.MulterError) {

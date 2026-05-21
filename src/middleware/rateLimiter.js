@@ -26,6 +26,26 @@ const videoGenerationLimiter = rateLimit({
   },
 });
 
+/** Strict flood shield for DALL-E mockup generation. */
+const mockupGenerationLimiter = rateLimit({
+  windowMs: GENERATION_WINDOW_MS,
+  max: GENERATION_MAX_PER_IP,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res, _next, options) => {
+    logger.warn('Mockup generation rate limit exceeded', {
+      ip: req.ip,
+      path: req.originalUrl,
+      windowMs: options.windowMs,
+      max: options.max,
+    });
+
+    res.status(429).json({
+      error: 'Too many mockup generations initiated. Please slow down and wait a few minutes.',
+    });
+  },
+});
+
 /** Balanced flood shield for Flutter status polling (3s cadence). */
 const statusPollingLimiter = rateLimit({
   windowMs: STATUS_WINDOW_MS,
@@ -48,5 +68,6 @@ const statusPollingLimiter = rateLimit({
 
 module.exports = {
   videoGenerationLimiter,
+  mockupGenerationLimiter,
   statusPollingLimiter,
 };
