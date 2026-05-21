@@ -6,7 +6,7 @@ const { MASK_DIR } = require('./services/tattooMaskEngine');
 const { logger } = require('./utils/logger');
 
 const app = express();
-
+app.set('trust proxy', 1);
 /** CORS — allows Flutter mobile / web clients during development. */
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
