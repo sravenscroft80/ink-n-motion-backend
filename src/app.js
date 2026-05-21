@@ -2,6 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const generateVideoRouter = require('./routes/generateVideo');
 const generateMockupRouter = require('./routes/generateMockup');
+const generateMockupRouter = require('./routes/generateMockup');
 const { MASK_DIR } = require('./services/tattooMaskEngine');
 const { logger } = require('./utils/logger');
 
@@ -39,7 +40,7 @@ app.use(express.json({ limit: '64kb' }));
 app.get('/health', (_req, res) => {
   res.status(200).json({ status: 'ok', service: 'ink-n-motion-api' });
 });
-
+app.use('/generate-mockup', generateMockupRouter);
 /** Public mask assets for the low-cost "Make it Sparkle" track. */
 app.use('/uploads/masks', express.static(MASK_DIR));
 
