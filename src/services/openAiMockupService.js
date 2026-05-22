@@ -2,8 +2,8 @@ const axios = require('axios');
 const { logger } = require('../utils/logger');
 
 const OPENAI_IMAGES_URL = 'https://api.openai.com/v1/images/generations';
-/** Hardcoded for deployment test — do not read OPENAI_IMAGE_MODEL. */
-const IMAGE_MODEL = 'gpt-4o';
+/** Hardcoded image model for /v1/images/generations. */
+const IMAGE_MODEL = 'dall-e-2';
 const DEFAULT_SIZE = '1024x1024';
 const OPENAI_TIMEOUT_MS = 120_000;
 
