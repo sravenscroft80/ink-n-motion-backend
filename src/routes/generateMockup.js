@@ -41,7 +41,7 @@ router.post('/', mockupGenerationLimiter, async (req, res) => {
       style: discoverySummary.style || null,
       location: discoverySummary.location || null,
       size: discoverySummary.size || null,
-      imageModel: 'dall-e-2',
+      imageModel: process.env.OPENAI_IMAGE_MODEL || 'dall-e-3',
     });
 
     const { imageUrl } = await generateMockupImage(discoverySummary);

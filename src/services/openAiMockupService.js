@@ -2,10 +2,17 @@ const axios = require('axios');
 const { logger } = require('../utils/logger');
 
 const OPENAI_IMAGES_URL = 'https://api.openai.com/v1/images/generations';
-/** Hardcoded image model for /v1/images/generations. */
-const IMAGE_MODEL = 'dall-e-2';
+const DEFAULT_IMAGE_MODEL = 'dall-e-3';
 const DEFAULT_SIZE = '1024x1024';
 const OPENAI_TIMEOUT_MS = 120_000;
+
+function resolveImageModel() {
+  const fromEnv = process.env.OPENAI_IMAGE_MODEL;
+  if (typeof fromEnv === 'string' && fromEnv.trim().length > 0) {
+    return fromEnv.trim();
+  }
+  return DEFAULT_IMAGE_MODEL;
+}
 
 function isPlaceholderSecret(value) {
   if (!value || typeof value !== 'string') return true;
@@ -108,9 +115,10 @@ async function generateMockupImage(discoverySummary) {
   }
 
   const prompt = buildMockupPrompt(discoverySummary);
+  const model = resolveImageModel();
 
   logger.info('OpenAI mockup generation starting', {
-    model: IMAGE_MODEL,
+    model,
     size: DEFAULT_SIZE,
     promptLength: prompt.length,
   });
@@ -119,7 +127,7 @@ async function generateMockupImage(discoverySummary) {
     const response = await axios.post(
       OPENAI_IMAGES_URL,
       {
-        model: IMAGE_MODEL,
+        model,
         prompt,
         n: 1,
         size: DEFAULT_SIZE,
