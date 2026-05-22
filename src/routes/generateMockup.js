@@ -11,8 +11,8 @@ const router = express.Router();
 
 /**
  * POST /generate-mockup
- * Accepts `{ discovery_summary: { style, size, location, reasoning, estimated_time } }`
- * and returns `{ imageUrl, image_url }` from DALL-E 3.
+ * Accepts `{ discovery_summary: {...} }` or `{ discoverySummary: {...} }`.
+ * Returns `{ imageUrl, image_url, image_base64? }` from OpenAI Images API.
  */
 router.post('/', mockupGenerationLimiter, async (req, res) => {
   const requestStartedAt = Date.now();
@@ -44,16 +44,22 @@ router.post('/', mockupGenerationLimiter, async (req, res) => {
       imageModel: process.env.OPENAI_IMAGE_MODEL || 'gpt-image-1',
     });
 
-    const { imageUrl } = await generateMockupImage(discoverySummary);
+    const { imageUrl, imageBase64 } = await generateMockupImage(discoverySummary);
 
     logger.info('generate-mockup completed', {
       durationMs: Date.now() - requestStartedAt,
+      delivery: imageBase64 ? 'base64' : 'url',
     });
 
-    return res.status(200).json({
+    const payload = {
       imageUrl,
       image_url: imageUrl,
-    });
+    };
+    if (imageBase64) {
+      payload.image_base64 = imageBase64;
+    }
+
+    return res.status(200).json(payload);
   } catch (error) {
     logger.error('generate-mockup failed', {
       code: error.code || 'mockup_generation_failed',

@@ -4,6 +4,8 @@ const { logger } = require('../utils/logger');
 const OPENAI_IMAGES_URL = 'https://api.openai.com/v1/images/generations';
 const DEFAULT_IMAGE_MODEL = 'gpt-image-1';
 const DEFAULT_SIZE = '1024x1024';
+const DEFAULT_QUALITY = 'medium';
+const DEFAULT_OUTPUT_FORMAT = 'png';
 const OPENAI_TIMEOUT_MS = 120_000;
 
 function resolveImageModel() {
@@ -99,8 +101,52 @@ function buildMockupPrompt(summary) {
   return parts.join(' ');
 }
 
+function isGptImageModel(model) {
+  return typeof model === 'string' && model.startsWith('gpt-image');
+}
+
+function buildImageGenerationRequest(model, prompt) {
+  const body = {
+    model,
+    prompt,
+    n: 1,
+    size: DEFAULT_SIZE,
+  };
+
+  if (isGptImageModel(model)) {
+    body.quality = DEFAULT_QUALITY;
+    body.output_format = DEFAULT_OUTPUT_FORMAT;
+  } else {
+    body.response_format = 'url';
+    body.quality = 'standard';
+  }
+
+  return body;
+}
+
+function resolveImageFromOpenAiResponse(responseData) {
+  const item = responseData?.data?.[0];
+  if (!item || typeof item !== 'object') {
+    return null;
+  }
+
+  if (typeof item.url === 'string' && item.url.trim().length > 0) {
+    return { imageUrl: item.url.trim(), imageBase64: null };
+  }
+
+  if (typeof item.b64_json === 'string' && item.b64_json.trim().length > 0) {
+    const imageBase64 = item.b64_json.trim();
+    return {
+      imageUrl: `data:image/png;base64,${imageBase64}`,
+      imageBase64,
+    };
+  }
+
+  return null;
+}
+
 /**
- * Calls OpenAI DALL-E 3 and returns a hosted image URL.
+ * Calls OpenAI Images API and returns a display URL (hosted or data URI).
  */
 async function generateMockupImage(discoverySummary) {
   const apiKey = process.env.OPENAI_API_KEY;
@@ -116,31 +162,25 @@ async function generateMockupImage(discoverySummary) {
 
   const prompt = buildMockupPrompt(discoverySummary);
   const model = resolveImageModel();
+  const requestBody = buildImageGenerationRequest(model, prompt);
 
   logger.info('OpenAI mockup generation starting', {
     model,
     size: DEFAULT_SIZE,
+    quality: requestBody.quality ?? null,
+    outputFormat: requestBody.output_format ?? null,
     promptLength: prompt.length,
   });
 
   try {
-    const response = await axios.post(
-      OPENAI_IMAGES_URL,
-      {
-        model,
-        prompt,
-        n: 1,
-        size: DEFAULT_SIZE,
+    const response = await axios.post(OPENAI_IMAGES_URL, requestBody, {
+      headers: {
+        Authorization: `Bearer ${apiKey.trim()}`,
+        'Content-Type': 'application/json',
       },
-      {
-        headers: {
-          Authorization: `Bearer ${apiKey.trim()}`,
-          'Content-Type': 'application/json',
-        },
-        timeout: OPENAI_TIMEOUT_MS,
-        validateStatus: (status) => status != null && status < 600,
-      },
-    );
+      timeout: OPENAI_TIMEOUT_MS,
+      validateStatus: (status) => status != null && status < 600,
+    });
 
     const status = response.status ?? 0;
     if (status < 200 || status >= 300) {
@@ -154,16 +194,29 @@ async function generateMockupImage(discoverySummary) {
       throw error;
     }
 
-    const imageUrl = response.data?.data?.[0]?.url;
-    if (typeof imageUrl !== 'string' || imageUrl.trim().length === 0) {
-      const error = new Error('OpenAI response missing image URL.');
+    const resolved = resolveImageFromOpenAiResponse(response.data);
+    if (!resolved) {
+      logger.error('OpenAI mockup generation returned unexpected payload', {
+        model,
+        dataKeys: Object.keys(response.data ?? {}),
+        firstItemKeys: Object.keys(response.data?.data?.[0] ?? {}),
+      });
+      const error = new Error(
+        'OpenAI response missing image data (expected url or b64_json).',
+      );
       error.code = 'openai_bad_response';
       error.statusCode = 502;
       throw error;
     }
 
+    logger.info('OpenAI mockup generation succeeded', {
+      model,
+      delivery: resolved.imageBase64 ? 'base64' : 'url',
+    });
+
     return {
-      imageUrl: imageUrl.trim(),
+      imageUrl: resolved.imageUrl,
+      imageBase64: resolved.imageBase64,
       prompt,
     };
   } catch (error) {
