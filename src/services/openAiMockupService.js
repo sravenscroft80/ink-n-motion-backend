@@ -2,7 +2,7 @@ const axios = require('axios');
 const { logger } = require('../utils/logger');
 
 const OPENAI_IMAGES_URL = 'https://api.openai.com/v1/images/generations';
-const DEFAULT_IMAGE_MODEL = 'dall-e-3';
+const DEFAULT_IMAGE_MODEL = 'gpt-image-1';
 const DEFAULT_SIZE = '1024x1024';
 const OPENAI_TIMEOUT_MS = 120_000;
 
