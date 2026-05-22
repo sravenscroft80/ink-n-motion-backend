@@ -41,6 +41,7 @@ router.post('/', mockupGenerationLimiter, async (req, res) => {
       style: discoverySummary.style || null,
       location: discoverySummary.location || null,
       size: discoverySummary.size || null,
+      imageModel: 'gpt-4o',
     });
 
     const { imageUrl } = await generateMockupImage(discoverySummary);

@@ -2,7 +2,8 @@ const axios = require('axios');
 const { logger } = require('../utils/logger');
 
 const OPENAI_IMAGES_URL = 'https://api.openai.com/v1/images/generations';
-const DEFAULT_MODEL = 'dall-e-3';
+/** Hardcoded for deployment test — do not read OPENAI_IMAGE_MODEL. */
+const IMAGE_MODEL = 'gpt-4o';
 const DEFAULT_SIZE = '1024x1024';
 const OPENAI_TIMEOUT_MS = 120_000;
 
@@ -109,7 +110,7 @@ async function generateMockupImage(discoverySummary) {
   const prompt = buildMockupPrompt(discoverySummary);
 
   logger.info('OpenAI mockup generation starting', {
-    model: DEFAULT_MODEL,
+    model: IMAGE_MODEL,
     size: DEFAULT_SIZE,
     promptLength: prompt.length,
   });
@@ -118,7 +119,7 @@ async function generateMockupImage(discoverySummary) {
     const response = await axios.post(
       OPENAI_IMAGES_URL,
       {
-        model: DEFAULT_MODEL,
+        model: IMAGE_MODEL,
         prompt,
         n: 1,
         size: DEFAULT_SIZE,
