@@ -72,20 +72,35 @@ function klingRequest(method, path, body = null) {
 }
 
 // ─── Submit image-to-video job ───────────────────────────────────────────────
-// imageUrl: publicly accessible URL of the tattoo image
+// imageUrl: public URL or base64 (raw or data URI)
 // durationSeconds: 5 or 10
 // stylePrompt: style-specific prompt text
+function normalizeKlingImage(imageUrl) {
+  if (!imageUrl || typeof imageUrl !== 'string') return imageUrl;
+  if (imageUrl.startsWith('data:')) {
+    const commaIndex = imageUrl.indexOf(',');
+    return commaIndex === -1 ? imageUrl : imageUrl.slice(commaIndex + 1);
+  }
+  return imageUrl;
+}
+
 async function submitKlingJob({ imageUrl, durationSeconds = 5, stylePrompt = '' }) {
+  const image = normalizeKlingImage(imageUrl);
   const body = {
     model_name: 'kling-v1',
-    image: imageUrl,
+    image,
     prompt: stylePrompt || 'cinematic tattoo animation, flowing ink movement',
     duration: String(durationSeconds),
     cfg_scale: 0.5,
     mode: 'std',
   };
 
-  logger.info('Submitting Kling i2v job', { durationSeconds, hasPrompt: Boolean(stylePrompt) });
+  logger.info('Submitting Kling i2v job', {
+    durationSeconds,
+    hasPrompt: Boolean(stylePrompt),
+    imageIsBase64: !image.startsWith('http'),
+    imageLength: image.length,
+  });
 
   const result = await klingRequest('POST', '/v1/videos/image2video', body);
 
