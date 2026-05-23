@@ -3,8 +3,6 @@
 // GET  /v1/studio/generate/status/:task_id — poll Kling job
 
 const express = require('express');
-const { tattooImageUpload } = require('../middleware/upload');
-const { optimizeImage } = require('../middleware/optimizeImage');
 const { videoGenerationLimiter, statusPollingLimiter } = require('../middleware/rateLimiter');
 const { submitKlingJob, pollKlingJob } = require('./klingProvider');
 const { logger } = require('../utils/logger');
@@ -46,35 +44,25 @@ function getStylePrompt(styleId) {
 router.post(
   '/animate',
   videoGenerationLimiter,
-  tattooImageUpload,
-  optimizeImage,
   async (req, res) => {
-    const styleId = (req.body.style_id || req.body.styleId || '').trim();
+    const imageBase64 = req.body.image_base64;
+    const styleId = (req.body.style_id || '').trim();
     const durationRaw = parseInt(req.body.duration_seconds || '5', 10);
     const durationSeconds = [5, 10].includes(durationRaw) ? durationRaw : 5;
 
     logger.info('Studio animate request', {
       styleId,
       durationSeconds,
-      hasFile: Boolean(req.file),
+      hasImageBase64: Boolean(imageBase64),
+      imageBase64Length: imageBase64 ? imageBase64.length : 0,
     });
 
-    if (!req.file) {
+    if (!imageBase64 || imageBase64.length < 100) {
       return res.status(400).json({ error: 'bad_request', message: 'Missing image file' });
     }
     if (!styleId) {
       return res.status(400).json({ error: 'bad_request', message: 'Missing style_id' });
     }
-
-    // Build a publicly accessible image URL
-    // On Render, uploaded files aren't public — we use the optimized path served
-    // via the /uploads/masks static route as a temp workaround, OR we base64-encode.
-    // Best approach: base64 data URI (Kling accepts it).
-    const fs = require('fs');
-    const imagePath = req.file.optimizedPath || req.file.path;
-    const imageBuffer = fs.readFileSync(imagePath);
-    const mimeType = req.file.optimizedPath ? 'image/jpeg' : req.file.mimetype;
-    const imageBase64 = `data:${mimeType};base64,${imageBuffer.toString('base64')}`;
 
     try {
       const taskId = await submitKlingJob({
@@ -82,12 +70,6 @@ router.post(
         durationSeconds,
         stylePrompt: getStylePrompt(styleId),
       });
-
-      // Clean up temp file
-      fs.unlink(imagePath, () => {});
-      if (req.file.optimizedPath && req.file.optimizedPath !== req.file.path) {
-        fs.unlink(req.file.path, () => {});
-      }
 
       return res.status(202).json({
         status: 'queued',
