@@ -11,6 +11,10 @@ const router = express.Router();
 
 // Style ID → Kling prompt map
 const STYLE_PROMPTS = {
+  cyberpunk_neon_glow: 'cyberpunk tattoo animation, electric neon lines pulsing, glowing circuitry flowing, futuristic energy radiating',
+  traditional_japanese_ink_flow: 'traditional Japanese ink wash animation, flowing brushstrokes, koi fish movement, cherry blossom petals drifting',
+  animated_pop_3d: 'bold pop art tattoo animation, vivid colors popping, 3D depth pulsing, dynamic comic energy bursting',
+  monochrome_shadow: 'monochrome tattoo animation, deep shadows flowing, bold contrast shifting, dramatic light and dark dance',
   traditional_japanese:
     'traditional Japanese ink wash animation, flowing brushstrokes, koi fish movement, cherry blossom petals drifting',
   neo_traditional:
@@ -96,7 +100,14 @@ router.get('/status/:task_id', statusPollingLimiter, async (req, res) => {
 
   try {
     const result = await pollKlingJob(taskId);
-    return res.status(200).json(result);
+    return res.status(200).json({
+      status: result.status,
+      video_url: result.videoUrl ?? null,
+      videoUrl: result.videoUrl ?? null,
+      task_result: result.raw
+        ? { videos: result.raw.task_result?.videos ?? [] }
+        : null,
+    });
   } catch (error) {
     logger.error('Studio poll failed', { taskId, message: error.message });
     return res.status(502).json({
