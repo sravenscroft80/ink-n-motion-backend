@@ -87,7 +87,7 @@ function normalizeKlingImage(imageUrl) {
 async function submitKlingJob({ imageUrl, durationSeconds = 5, stylePrompt = '' }) {
   const image = normalizeKlingImage(imageUrl);
   const body = {
-    model_name: 'kling-v1',
+    model_name: 'kling-v2-5-turbo',
     image,
     prompt: stylePrompt || 'cinematic tattoo animation, flowing ink movement',
     duration: String(durationSeconds),
