@@ -38,6 +38,26 @@ const PROMPT_TEMPLATES = {
     adjectives: ['high contrast', 'chiaroscuro', 'slow shadow play'],
     basePrompt: 'Monochrome tattoo study, {adjectives}, dramatic studio lighting',
   },
+  alex_grey_visionary: {
+    adjectives: [],
+    basePrompt:
+      'visionary psychedelic tattoo animation, sacred geometry fractals flowing, alex grey inspired neural tapestry, bioluminescent patterns breathing, consciousness expanding motion',
+  },
+  steampunk_clockwork: {
+    adjectives: [],
+    basePrompt:
+      'steampunk tattoo animation, brass gears rotating, copper pipe steam venting, clockwork mechanisms ticking, Victorian industrial motion, warm sepia tones',
+  },
+  anime_cel_shaded: {
+    adjectives: [],
+    basePrompt:
+      'anime cel-shaded tattoo animation, bold ink outlines pulsing, vibrant flat colours, manga speed lines radiating, Japanese animation style motion',
+  },
+  gothic_horror: {
+    adjectives: [],
+    basePrompt:
+      'gothic horror tattoo animation, dark shadows crawling, moonlit fog drifting, ravens circling, candlelight flickering, dramatic chiaroscuro motion',
+  },
   default: {
     adjectives: ['cinematic', 'high contrast', 'studio lighting'],
     basePrompt: 'Premium tattoo motion study, {adjectives}',
