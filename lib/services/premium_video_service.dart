@@ -19,7 +19,3 @@ class PremiumVideoService {
     _ref.read(appStateProvider.notifier).resetPremiumGenerationStatus();
   }
 }
-
-final premiumVideoServiceProvider = Provider<PremiumVideoService>((ref) {
-  return PremiumVideoService(ref);
-});
