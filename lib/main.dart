@@ -4,8 +4,6 @@ import 'package:flutter/cupertino.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:ink_n_motion/config/app_config.dart';
-
 import 'package:ink_n_motion/firebase_options.dart';
 
 import 'package:ink_n_motion/screens/home_screen.dart';
@@ -40,82 +38,43 @@ Future<void> main() async {
 
 
 
-  if (AppConfig.isFirebaseConfigured) {
-
-    try {
-
-      if (Firebase.apps.isEmpty) {
-
-        await Firebase.initializeApp(
-
-          options: DefaultFirebaseOptions.currentPlatform,
-
-        );
-
-      }
-
-    } catch (error, stackTrace) {
-
-      debugPrint(
-
-        'FirebaseAuthService: Firebase not configured — using local fallback',
-
+  try {
+    if (Firebase.apps.isEmpty) {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
       );
-
-      debugPrint('$error');
-
-      debugPrint('$stackTrace');
-
     }
-
+  } catch (error, stackTrace) {
+    debugPrint('Firebase.initializeApp failed: $error');
+    debugPrint('$stackTrace');
   }
-
-
 
   final authService = FirebaseAuthService();
 
   try {
-
     await authService.initialize();
-
   } catch (error, stackTrace) {
-
-    debugPrint(
-
-      'FirebaseAuthService: Firebase not configured — using local fallback',
-
-    );
-
-    debugPrint('$error');
-
+    debugPrint('FirebaseAuthService.initialize failed: $error');
     debugPrint('$stackTrace');
-
   }
-
-
 
   await BillingService.init();
 
-
-
   final userService = UserService(authService: authService);
 
+  try {
+    if (authService.isAvailable && authService.uid != null) {
+      final revenueCatUserId =
+          await BillingService.linkToFirebaseUser(authService.uid!) ??
+              await BillingService.currentAppUserId();
 
-
-  if (authService.isAvailable && authService.uid != null) {
-
-    final revenueCatUserId =
-
-        await BillingService.linkToFirebaseUser(authService.uid!) ??
-
-            await BillingService.currentAppUserId();
-
-    if (revenueCatUserId != null) {
-
-      // await userService.linkRevenueCatAppUserId(revenueCatUserId);
-
+      if (revenueCatUserId != null) {
+        // await userService.linkRevenueCatAppUserId(revenueCatUserId);
+      }
     }
-
+  } catch (error, stackTrace) {
+    debugPrint('Firebase/RevenueCat linking failed: $error');
+    debugPrint('$stackTrace');
   }
 
 
