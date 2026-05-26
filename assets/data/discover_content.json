@@ -1,0 +1,914 @@
+{
+  "resources": [
+    {
+      "id": "vintage-tattoo-flash",
+      "title": "Vintage Tattoo Flash",
+      "description": "Jonathan Shaw's landmark collection documenting outlaw tattoo flash from the mid-20th century — essential reference for traditional collectors.",
+      "type": "book",
+      "linkUrl": "https://www.amazon.com/s?k=Vintage+Tattoo+Flash+tattoo"
+    },
+    {
+      "id": "tattoo-history-source-book",
+      "title": "The Tattoo History Source Book",
+      "description": "Steve Gilbert's definitive anthology tracing tattoo traditions worldwide, from ancient ritual to modern studio culture.",
+      "type": "book",
+      "linkUrl": "https://www.amazon.com/s?k=The+Tattoo+History+Source+Book+tattoo"
+    },
+    {
+      "id": "bodies-of-subversion",
+      "title": "Bodies of Subversion",
+      "description": "Margot Mifflin's cultural history of women and tattooing — a scholarly, readable survey of identity, art, and social change.",
+      "type": "book",
+      "linkUrl": "https://www.amazon.com/s?k=Bodies+of+Subversion+tattoo"
+    },
+    {
+      "id": "1000-tattoos",
+      "title": "1000 Tattoos",
+      "description": "Henk Schiffmacher's visual encyclopedia spanning global tattoo styles — ideal for inspiration boards and style research.",
+      "type": "book",
+      "linkUrl": "https://www.amazon.com/s?k=1000+Tattoos+tattoo"
+    },
+    {
+      "id": "mammoth-book-of-tattoos",
+      "title": "The Mammoth Book of Tattoos",
+      "description": "Lal Hardy's broad compendium covering techniques, icons, and shop history — a practical primer for newcomers and pros alike.",
+      "type": "book",
+      "linkUrl": "https://www.amazon.com/s?k=The+Mammoth+Book+of+Tattoos+tattoo"
+    },
+    {
+      "id": "sailor-jerrys-tattoo-stencils",
+      "title": "Sailor Jerry's Tattoo Stencils",
+      "description": "Archive of Norman Collins's classic flash and stencil work — the backbone of American traditional tattoo literacy.",
+      "type": "book",
+      "linkUrl": "https://www.amazon.com/s?k=Sailor+Jerry%27s+Tattoo+Stencils+tattoo"
+    },
+    {
+      "id": "polynesian-tattoo-handbook",
+      "title": "The Polynesian Tattoo Handbook",
+      "description": "Roberto Gemori's guide to Pacific Island motifs and meanings — respectful context for tatau and related traditions.",
+      "type": "book",
+      "linkUrl": "https://www.amazon.com/s?k=The+Polynesian+Tattoo+Handbook+tattoo"
+    },
+    {
+      "id": "russian-criminal-tattoo-encyclopaedia-vol-1",
+      "title": "Russian Criminal Tattoo Encyclopaedia Vol 1",
+      "description": "Danzig Baldaev's documented iconography from Soviet prison culture — a stark, historically significant visual archive.",
+      "type": "book",
+      "linkUrl": "https://www.amazon.com/s?k=Russian+Criminal+Tattoo+Encyclopaedia+Vol+1+tattoo"
+    },
+    {
+      "id": "modern-primitives",
+      "title": "Modern Primitives",
+      "description": "V. Vale's RE/Search volume on the 1980s–90s body-modification movement — interviews and imagery that shaped contemporary tattooing.",
+      "type": "book",
+      "linkUrl": "https://www.amazon.com/s?k=Modern+Primitives+tattoo"
+    },
+    {
+      "id": "wear-your-dreams",
+      "title": "Wear Your Dreams",
+      "description": "Ed Hardy's memoir and career retrospective — from fine art to the brand that brought tattoo culture into the mainstream.",
+      "type": "book",
+      "linkUrl": "https://www.amazon.com/s?k=Wear+Your+Dreams+tattoo"
+    },
+    {
+      "id": "inked-magazine",
+      "title": "Inked Magazine",
+      "description": "Flagship lifestyle and artist coverage magazine — news, portfolios, and culture from the global tattoo scene.",
+      "type": "magazine",
+      "linkUrl": "https://www.amazon.com/s?k=Inked+Magazine+tattoo"
+    },
+    {
+      "id": "tattoo-life",
+      "title": "Tattoo Life",
+      "description": "International publication featuring artist profiles, convention coverage, and technique-focused editorial.",
+      "type": "magazine",
+      "linkUrl": "https://www.amazon.com/s?k=Tattoo+Life+tattoo"
+    },
+    {
+      "id": "inkppl",
+      "title": "iNKPPL",
+      "description": "Contemporary digital-first magazine spotlighting emerging artists and studio culture worldwide.",
+      "type": "magazine",
+      "linkUrl": "https://www.amazon.com/s?k=iNKPPL+tattoo"
+    },
+    {
+      "id": "tattoo-artist-magazine",
+      "title": "Tattoo Artist Magazine",
+      "description": "Industry trade publication with business, technique, and equipment coverage for working tattoo professionals.",
+      "type": "magazine",
+      "linkUrl": "https://www.amazon.com/s?k=Tattoo+Artist+Magazine+tattoo"
+    },
+    {
+      "id": "skin-deep",
+      "title": "Skin Deep",
+      "description": "UK-based magazine blending artist portfolios with thoughtful essays on tattoo history and subculture.",
+      "type": "magazine",
+      "linkUrl": "https://www.amazon.com/s?k=Skin+Deep+tattoo"
+    },
+    {
+      "id": "tattoo-society",
+      "title": "Tattoo Society",
+      "description": "Curated artist features and collector stories from an editorial team focused on premium studio work.",
+      "type": "magazine",
+      "linkUrl": "https://www.amazon.com/s?k=Tattoo+Society+tattoo"
+    },
+    {
+      "id": "total-tattoo",
+      "title": "Total Tattoo",
+      "description": "Long-running European magazine covering conventions, flash, and regional shop scenes across the continent.",
+      "type": "magazine",
+      "linkUrl": "https://www.amazon.com/s?k=Total+Tattoo+tattoo"
+    },
+    {
+      "id": "tattoo-energy",
+      "title": "Tattoo Energy",
+      "description": "Italian publication emphasizing bold color work, large-scale pieces, and international guest artist spotlights.",
+      "type": "magazine",
+      "linkUrl": "https://www.amazon.com/s?k=Tattoo+Energy+tattoo"
+    },
+    {
+      "id": "needles-and-sins",
+      "title": "Needles and Sins",
+      "description": "Independent blog and resource hub for tattoo news, legal updates, and artist interviews since 2007.",
+      "type": "magazine",
+      "linkUrl": "https://www.amazon.com/s?k=Needles+and+Sins+tattoo"
+    },
+    {
+      "id": "tattoo-archive",
+      "title": "Tattoo Archive",
+      "description": "Historical preservation project documenting American tattoo heritage, flash sheets, and pioneer artists.",
+      "type": "magazine",
+      "linkUrl": "https://www.amazon.com/s?k=Tattoo+Archive+tattoo"
+    }
+  ],
+  "artistSpotlight": [
+    {
+      "name": "Mara Voss",
+      "bio": "Berlin-based artist known for delicate floral compositions with precise single-needle work and soft shading.",
+      "style": "Fine-Line Botanical",
+      "linkUrl": "https://www.google.com/search?q=Mara+Voss+tattoo+artist",
+      "imageUrl": "assets/images/artist_spotlight.png"
+    },
+    {
+      "name": "Jax Ortega",
+      "bio": "Los Angeles studio lead specializing in saturated neo-traditional pieces with bold outlines and dynamic color blocking.",
+      "style": "Neo-Traditional",
+      "linkUrl": "https://www.google.com/search?q=Jax+Ortega+tattoo+artist",
+      "imageUrl": "assets/images/default_artist_avatar.png"
+    },
+    {
+      "name": "Sienna Kade",
+      "bio": "Tokyo artist blending mathematical precision with spiritual symbolism in large-scale geometric sleeves.",
+      "style": "Sacred Geometry",
+      "linkUrl": "https://www.google.com/search?q=Sienna+Kade+tattoo+artist",
+      "imageUrl": "assets/images/discover_hero.png"
+    },
+    {
+      "name": "Theo Ashford",
+      "bio": "London blackwork specialist creating fluid negative-space panels inspired by abstract sculpture.",
+      "style": "Blackwork",
+      "linkUrl": "https://www.google.com/search?q=Theo+Ashford+tattoo+artist",
+      "imageUrl": "assets/images/style_archive.png"
+    },
+    {
+      "name": "Rin Delacroix",
+      "bio": "Paris portrait artist capturing emotional depth through hyper-realistic grayscale likeness work.",
+      "style": "Portrait Realism",
+      "linkUrl": "https://www.google.com/search?q=Rin+Delacroix+tattoo+artist",
+      "imageUrl": "assets/images/ai_coach.png"
+    },
+    {
+      "name": "Cruz Mendez",
+      "bio": "Miami artist merging graffiti aesthetics with tattoo tradition in high-contrast urban compositions.",
+      "style": "Street Fusion",
+      "linkUrl": "https://www.google.com/search?q=Cruz+Mendez+tattoo+artist",
+      "imageUrl": "assets/images/ink_chronicles.png"
+    },
+    {
+      "name": "Hana Iwata",
+      "bio": "Osaka minimalist known for restrained single-needle pieces that emphasize negative space and breath.",
+      "style": "Minimalist",
+      "linkUrl": "https://www.google.com/search?q=Hana+Iwata+tattoo+artist",
+      "imageUrl": "assets/images/workflow/workflow_step_00_prepare.png"
+    },
+    {
+      "name": "Dante Cole",
+      "bio": "Chicago biomech artist engineering mechanical joints and organic fusion on large-format body work.",
+      "style": "Biomechanical",
+      "linkUrl": "https://www.google.com/search?q=Dante+Cole+tattoo+artist",
+      "imageUrl": "assets/images/workflow/workflow_step_01_capture.png"
+    },
+    {
+      "name": "Yara Mensah",
+      "bio": "Accra artist weaving Adinkra-inspired motifs into contemporary pattern systems with cultural integrity.",
+      "style": "Cultural Pattern",
+      "linkUrl": "https://www.google.com/search?q=Yara+Mensah+tattoo+artist",
+      "imageUrl": "assets/images/workflow/workflow_step_02_select.png"
+    },
+    {
+      "name": "Felix Arden",
+      "bio": "Melbourne narrative tattooer storyboarding multi-panel illustrative scenes across sleeves and back pieces.",
+      "style": "Illustrative",
+      "linkUrl": "https://www.google.com/search?q=Felix+Arden+tattoo+artist",
+      "imageUrl": "assets/images/workflow/workflow_step_03_render.png"
+    },
+    {
+      "name": "Nova Keane",
+      "bio": "New York watercolor specialist layering translucent color washes over structural linework.",
+      "style": "Watercolor",
+      "linkUrl": "https://www.google.com/search?q=Nova+Keane+tattoo+artist",
+      "imageUrl": "assets/images/workflow/workflow_step_04_share.png"
+    },
+    {
+      "name": "Elliot Prasad",
+      "bio": "Mumbai lettering artist crafting custom script pieces with calligraphic rhythm and devotional text.",
+      "style": "Script & Lettering",
+      "linkUrl": "https://www.google.com/search?q=Elliot+Prasad+tattoo+artist",
+      "imageUrl": "assets/images/artist_spotlight.png"
+    },
+    {
+      "name": "Amara Okonkwo",
+      "bio": "Honolulu practitioner trained in traditional tatau techniques with deep respect for Pacific lineage.",
+      "style": "Polynesian Tatau",
+      "linkUrl": "https://www.google.com/search?q=Amara+Okonkwo+tattoo+artist",
+      "imageUrl": "assets/images/default_artist_avatar.png"
+    },
+    {
+      "name": "Luca Ferrara",
+      "bio": "Rome artist translating classical painting techniques into skin with chiaroscuro shading.",
+      "style": "Italian Renaissance",
+      "linkUrl": "https://www.google.com/search?q=Luca+Ferrara+tattoo+artist",
+      "imageUrl": "assets/images/discover_hero.png"
+    },
+    {
+      "name": "Priya Sharma",
+      "bio": "Delhi artist blending henna-inspired pattern language with permanent fine-line tattoo work.",
+      "style": "Mehndi Fusion",
+      "linkUrl": "https://www.google.com/search?q=Priya+Sharma+tattoo+artist",
+      "imageUrl": "assets/images/style_archive.png"
+    },
+    {
+      "name": "Henrik Lund",
+      "bio": "Stockholm artist specializing in historically researched runic and Viking-era symbolic work.",
+      "style": "Nordic Runes",
+      "linkUrl": "https://www.google.com/search?q=Henrik+Lund+tattoo+artist",
+      "imageUrl": "assets/images/ai_coach.png"
+    },
+    {
+      "name": "Camille Dubois",
+      "bio": "Lyon artist drawing from Art Nouveau illustration for flowing ornamental feminine compositions.",
+      "style": "Art Nouveau",
+      "linkUrl": "https://www.google.com/search?q=Camille+Dubois+tattoo+artist",
+      "imageUrl": "assets/images/ink_chronicles.png"
+    },
+    {
+      "name": "Kenji Tanaka",
+      "bio": "Kyoto horishi continuing tebori hand-tapping methods within traditional irezumi composition rules.",
+      "style": "Japanese Irezumi",
+      "linkUrl": "https://www.google.com/search?q=Kenji+Tanaka+tattoo+artist",
+      "imageUrl": "assets/images/workflow/workflow_step_00_prepare.png"
+    },
+    {
+      "name": "Sofia Reyes",
+      "bio": "East LA black-and-grey master creating photorealistic scenes rooted in Chicano art history.",
+      "style": "Chicano Black & Grey",
+      "linkUrl": "https://www.google.com/search?q=Sofia+Reyes+tattoo+artist",
+      "imageUrl": "assets/images/workflow/workflow_step_01_capture.png"
+    },
+    {
+      "name": "Omar Hassan",
+      "bio": "Cairo calligraphy artist inscribing Arabic script with typographic precision and spiritual intent.",
+      "style": "Arabic Calligraphy",
+      "linkUrl": "https://www.google.com/search?q=Omar+Hassan+tattoo+artist",
+      "imageUrl": "assets/images/workflow/workflow_step_02_select.png"
+    },
+    {
+      "name": "Ingrid Solberg",
+      "bio": "Oslo dotwork specialist building tone and texture through meticulous stippling and mandala forms.",
+      "style": "Dotwork",
+      "linkUrl": "https://www.google.com/search?q=Ingrid+Solberg+tattoo+artist",
+      "imageUrl": "assets/images/workflow/workflow_step_03_render.png"
+    },
+    {
+      "name": "Marcus Webb",
+      "bio": "Brooklyn traditionalist preserving bold sailor-era iconography with crisp lines and limited palettes.",
+      "style": "American Traditional",
+      "linkUrl": "https://www.google.com/search?q=Marcus+Webb+tattoo+artist",
+      "imageUrl": "assets/images/workflow/workflow_step_04_share.png"
+    },
+    {
+      "name": "Aisha Rahman",
+      "bio": "Singapore micro-realism artist rendering tiny detailed portraits with single-needle precision.",
+      "style": "Micro Realism",
+      "linkUrl": "https://www.google.com/search?q=Aisha+Rahman+tattoo+artist",
+      "imageUrl": "assets/images/artist_spotlight.png"
+    },
+    {
+      "name": "Diego Morales",
+      "bio": "Mexico City trash polka artist combining photorealism with abstract red and black graphic overlays.",
+      "style": "Trash Polka",
+      "linkUrl": "https://www.google.com/search?q=Diego+Morales+tattoo+artist",
+      "imageUrl": "assets/images/default_artist_avatar.png"
+    },
+    {
+      "name": "Elena Volkov",
+      "bio": "Saint Petersburg artist reviving Slavic folk motifs through contemporary illustrative tattoo design.",
+      "style": "Slavic Folk",
+      "linkUrl": "https://www.google.com/search?q=Elena+Volkov+tattoo+artist",
+      "imageUrl": "assets/images/discover_hero.png"
+    },
+    {
+      "name": "James O'Brien",
+      "bio": "Dublin Celtic revival artist referencing Insular manuscript art and stone carving traditions.",
+      "style": "Celtic Knotwork",
+      "linkUrl": "https://www.google.com/search?q=James+O%27Brien+tattoo+artist",
+      "imageUrl": "assets/images/style_archive.png"
+    },
+    {
+      "name": "Mei Lin Chen",
+      "bio": "Taipei artist adapting Chinese brush painting aesthetics to flowing tattoo compositions.",
+      "style": "Chinese Brush",
+      "linkUrl": "https://www.google.com/search?q=Mei+Lin+Chen+tattoo+artist",
+      "imageUrl": "assets/images/ai_coach.png"
+    },
+    {
+      "name": "Andre Silva",
+      "bio": "São Paulo colorist known for vibrant tropical palettes and expressive neo-traditional animals.",
+      "style": "Brazilian Color",
+      "linkUrl": "https://www.google.com/search?q=Andre+Silva+tattoo+artist",
+      "imageUrl": "assets/images/ink_chronicles.png"
+    },
+    {
+      "name": "Nadia Petrov",
+      "bio": "Prague artist mimicking copperplate etching cross-hatching for antique print-inspired tattoos.",
+      "style": "Etching Style",
+      "linkUrl": "https://www.google.com/search?q=Nadia+Petrov+tattoo+artist",
+      "imageUrl": "assets/images/workflow/workflow_step_00_prepare.png"
+    },
+    {
+      "name": "Chris Nakamura",
+      "bio": "Seattle anime-style tattooer translating manga aesthetics into durable skin-ready linework.",
+      "style": "Anime Illustration",
+      "linkUrl": "https://www.google.com/search?q=Chris+Nakamura+tattoo+artist",
+      "imageUrl": "assets/images/workflow/workflow_step_01_capture.png"
+    },
+    {
+      "name": "Zara Mitchell",
+      "bio": "Portland artist rendering botanically accurate flora with scientific illustration precision.",
+      "style": "Botanical Scientific",
+      "linkUrl": "https://www.google.com/search?q=Zara+Mitchell+tattoo+artist",
+      "imageUrl": "assets/images/workflow/workflow_step_02_select.png"
+    },
+    {
+      "name": "Raj Patel",
+      "bio": "Ahmedabad mandala specialist composing radial symmetry pieces with meditative repetition.",
+      "style": "Mandala",
+      "linkUrl": "https://www.google.com/search?q=Raj+Patel+tattoo+artist",
+      "imageUrl": "assets/images/workflow/workflow_step_03_render.png"
+    },
+    {
+      "name": "Isabelle Moreau",
+      "bio": "Montreal abstract tattooer creating gallery-inspired non-representational body compositions.",
+      "style": "Fine Art Abstract",
+      "linkUrl": "https://www.google.com/search?q=Isabelle+Moreau+tattoo+artist",
+      "imageUrl": "assets/images/workflow/workflow_step_04_share.png"
+    },
+    {
+      "name": "Tomas Rivera",
+      "bio": "San Antonio artist honoring lowrider and Chicano car culture in detailed illustrative panels.",
+      "style": "Lowrider Culture",
+      "linkUrl": "https://www.google.com/search?q=Tomas+Rivera+tattoo+artist",
+      "imageUrl": "assets/images/artist_spotlight.png"
+    },
+    {
+      "name": "Yuki Sato",
+      "bio": "Osaka neo-traditional artist specializing in horror motifs with vintage flash sensibility.",
+      "style": "Horror Neo-Trad",
+      "linkUrl": "https://www.google.com/search?q=Yuki+Sato+tattoo+artist",
+      "imageUrl": "assets/images/default_artist_avatar.png"
+    },
+    {
+      "name": "Grace Holloway",
+      "bio": "Edinburgh gothic artist drawing from Victorian mourning art and dark romantic literature.",
+      "style": "Victorian Gothic",
+      "linkUrl": "https://www.google.com/search?q=Grace+Holloway+tattoo+artist",
+      "imageUrl": "assets/images/discover_hero.png"
+    },
+    {
+      "name": "Viktor Novak",
+      "bio": "Prague surrealist creating dreamlike juxtapositions inspired by Dalí and contemporary gallery surrealism.",
+      "style": "Surrealism",
+      "linkUrl": "https://www.google.com/search?q=Viktor+Novak+tattoo+artist",
+      "imageUrl": "assets/images/style_archive.png"
+    },
+    {
+      "name": "Leila Ahmadi",
+      "bio": "Tehran artist adapting Persian miniature painting traditions to intricate tattoo scale.",
+      "style": "Persian Miniature",
+      "linkUrl": "https://www.google.com/search?q=Leila+Ahmadi+tattoo+artist",
+      "imageUrl": "assets/images/ai_coach.png"
+    },
+    {
+      "name": "Sam Okafor",
+      "bio": "Lagos tribal fusion artist blending West African pattern systems with modern blackwork structure.",
+      "style": "Tribal Fusion",
+      "linkUrl": "https://www.google.com/search?q=Sam+Okafor+tattoo+artist",
+      "imageUrl": "assets/images/ink_chronicles.png"
+    },
+    {
+      "name": "Clara Jensen",
+      "bio": "Copenhagen minimalist creating quiet Nordic-inspired linework with architectural clarity.",
+      "style": "Scandinavian Minimal",
+      "linkUrl": "https://www.google.com/search?q=Clara+Jensen+tattoo+artist",
+      "imageUrl": "assets/images/workflow/workflow_step_00_prepare.png"
+    },
+    {
+      "name": "Mateo Cruz",
+      "bio": "Barcelona religious icon artist rendering Byzantine and Catholic iconography with devotional care.",
+      "style": "Religious Icon",
+      "linkUrl": "https://www.google.com/search?q=Mateo+Cruz+tattoo+artist",
+      "imageUrl": "assets/images/workflow/workflow_step_01_capture.png"
+    },
+    {
+      "name": "Anya Kozlov",
+      "bio": "Moscow realism artist mastering smooth whip-shaded gradients for photorealistic portraits.",
+      "style": "Whip Shading",
+      "linkUrl": "https://www.google.com/search?q=Anya+Kozlov+tattoo+artist",
+      "imageUrl": "assets/images/workflow/workflow_step_02_select.png"
+    },
+    {
+      "name": "Jordan Blake",
+      "bio": "Austin patchwork tattooer assembling flash-style patch collections into cohesive body layouts.",
+      "style": "Patchwork",
+      "linkUrl": "https://www.google.com/search?q=Jordan+Blake+tattoo+artist",
+      "imageUrl": "assets/images/workflow/workflow_step_03_render.png"
+    },
+    {
+      "name": "Fatima Al-Hassan",
+      "bio": "Dubai ornamental artist specializing in arabesque flowing patterns and architectural detail.",
+      "style": "Arabesque Ornamental",
+      "linkUrl": "https://www.google.com/search?q=Fatima+Al-Hassan+tattoo+artist",
+      "imageUrl": "assets/images/workflow/workflow_step_04_share.png"
+    },
+    {
+      "name": "Enzo Romano",
+      "bio": "Naples old-school artist preserving Mediterranean traditional flash with hand-poked influence.",
+      "style": "Old School Italian",
+      "linkUrl": "https://www.google.com/search?q=Enzo+Romano+tattoo+artist",
+      "imageUrl": "assets/images/artist_spotlight.png"
+    },
+    {
+      "name": "Hannah Weiss",
+      "bio": "Vienna anatomy artist tattooing medical illustration-quality musculoskeletal and organ diagrams.",
+      "style": "Scientific Anatomy",
+      "linkUrl": "https://www.google.com/search?q=Hannah+Weiss+tattoo+artist",
+      "imageUrl": "assets/images/default_artist_avatar.png"
+    },
+    {
+      "name": "Kwame Asante",
+      "bio": "Kumasi artist specializing in Ghanaian Adinkra symbols with scholarly cultural documentation.",
+      "style": "Adinkra Symbolism",
+      "linkUrl": "https://www.google.com/search?q=Kwame+Asante+tattoo+artist",
+      "imageUrl": "assets/images/discover_hero.png"
+    },
+    {
+      "name": "Olivia Park",
+      "bio": "Seoul fine-line artist creating delicate K-beauty-inspired feminine linework and micro florals.",
+      "style": "K-Beauty Fine Line",
+      "linkUrl": "https://www.google.com/search?q=Olivia+Park+tattoo+artist",
+      "imageUrl": "assets/images/style_archive.png"
+    },
+    {
+      "name": "Rafael Santos",
+      "bio": "Rio blackwork artist producing large-scale ornamental black-fill pieces with graphic impact.",
+      "style": "Brazilian Blackwork",
+      "linkUrl": "https://www.google.com/search?q=Rafael+Santos+tattoo+artist",
+      "imageUrl": "assets/images/ai_coach.png"
+    },
+    {
+      "name": "Morgan Tate",
+      "bio": "Toronto cover-up expert redesigning legacy tattoos into cohesive new narratives.",
+      "style": "Cover-Up Specialist",
+      "linkUrl": "https://www.google.com/search?q=Morgan+Tate+tattoo+artist",
+      "imageUrl": "assets/images/ink_chronicles.png"
+    }
+  ],
+  "styleArchive": [
+    {
+      "id": "japanese-irezumi",
+      "name": "Japanese Irezumi",
+      "description": "A full-body narrative tradition rooted in Edo-period woodblock culture, where dragons, koi, and seasonal flora carry social meaning across generations.",
+      "historical_era": "Ancient",
+      "hero_image": "assets/images/styles/japanese_irezumi_hero.png",
+      "origin": "Irezumi developed through ukiyo-e printmakers and hand-poked methods before electric machines spread in the twentieth century. Motifs were composed for bodily flow, wrapping limbs and torsos as continuous stories rather than isolated icons.",
+      "technique": "In Japan, irezumi has long oscillated between artisan craft and social stigma. Today, scholars study its iconography as living folklore, while artists abroad adapt its compositional grammar with careful respect for origin.",
+      "gallery_images": [
+        {
+          "asset": "assets/images/workflow/workflow_step_00_prepare.png",
+          "caption": "Archival plate from early regional documentation.",
+          "reference_type": "historical_reference"
+        },
+        {
+          "asset": "assets/images/workflow/workflow_step_01_capture.png",
+          "caption": "Museum folio tracing motif evolution across decades.",
+          "reference_type": "historical_reference"
+        },
+        {
+          "asset": "assets/images/workflow/workflow_step_02_select.png",
+          "caption": "Contemporary studio work honoring traditional structure.",
+          "reference_type": "modern_interpretation"
+        }
+      ]
+    },
+    {
+      "id": "polynesian-tatau",
+      "name": "Polynesian Tatau",
+      "description": "Sacred pattern systems from the Pacific, where line families record genealogy, rank, and passage into adulthood.",
+      "historical_era": "Tribal",
+      "hero_image": "assets/images/styles/polynesian_tatau_hero.png",
+      "origin": "Tatau was practiced across Samoa, Tonga, and neighboring islands for centuries using comb-tapping tools. Patterns were taught within families and applied during ceremonies that bound community identity to the skin.",
+      "technique": "Colonial disruption nearly erased several regional lineages; modern practitioners work with elders to restore technique and ensure motifs remain culturally anchored rather than decorative copies.",
+      "gallery_images": [
+        {
+          "asset": "assets/images/workflow/workflow_step_01_capture.png",
+          "caption": "Archival plate from early regional documentation.",
+          "reference_type": "historical_reference"
+        },
+        {
+          "asset": "assets/images/workflow/workflow_step_02_select.png",
+          "caption": "Museum folio tracing motif evolution across decades.",
+          "reference_type": "historical_reference"
+        },
+        {
+          "asset": "assets/images/workflow/workflow_step_03_render.png",
+          "caption": "Contemporary studio work honoring traditional structure.",
+          "reference_type": "modern_interpretation"
+        }
+      ]
+    },
+    {
+      "id": "american-traditional",
+      "name": "American Traditional",
+      "description": "Bold outlines, limited palettes, and sailor-era symbolism that defined twentieth-century Western shop culture.",
+      "historical_era": "Modern",
+      "hero_image": "assets/images/styles/american_traditional_hero.png",
+      "origin": "American Traditional crystallized in port cities where naval travel mixed with early electric tattooing. Rose, eagle, anchor, and banner motifs became a shared visual shorthand across East Coast and West Coast shops by the 1940s.",
+      "technique": "The style became a foundation for global tattoo literacy. Its readability and icon set still teach newcomers how tattooing communicates permanence, loyalty, and personal milestones.",
+      "gallery_images": [
+        {
+          "asset": "assets/images/workflow/workflow_step_02_select.png",
+          "caption": "Archival plate from early regional documentation.",
+          "reference_type": "historical_reference"
+        },
+        {
+          "asset": "assets/images/workflow/workflow_step_03_render.png",
+          "caption": "Museum folio tracing motif evolution across decades.",
+          "reference_type": "historical_reference"
+        },
+        {
+          "asset": "assets/images/workflow/workflow_step_04_share.png",
+          "caption": "Contemporary studio work honoring traditional structure.",
+          "reference_type": "modern_interpretation"
+        }
+      ]
+    },
+    {
+      "id": "maori-ta-moko",
+      "name": "Maori Ta Moko",
+      "description": "Facial and body carving traditions that encode whakapapa, ancestry, status, and tribal affiliation, in curvilinear relief.",
+      "historical_era": "Tribal",
+      "hero_image": "assets/images/styles/maori_ta_moko_hero.png",
+      "origin": "Ta moko predates European contact in Aotearoa. Chisel-based application created textured grooves distinct from ink-only methods, with designs unique to the individual rather than repeatable flash sheets.",
+      "technique": "Ta moko is protected as cultural expression; contemporary debates center on who may wear specific patterns and how museums should contextualize historical portraits.",
+      "gallery_images": [
+        {
+          "asset": "assets/images/ink_chronicles.png",
+          "caption": "Archival plate from early regional documentation.",
+          "reference_type": "historical_reference"
+        },
+        {
+          "asset": "assets/images/artist_spotlight.png",
+          "caption": "Museum folio tracing motif evolution across decades.",
+          "reference_type": "historical_reference"
+        },
+        {
+          "asset": "assets/images/style_archive.png",
+          "caption": "Contemporary studio work honoring traditional structure.",
+          "reference_type": "modern_interpretation"
+        }
+      ]
+    },
+    {
+      "id": "celtic-knotwork",
+      "name": "Celtic Knotwork",
+      "description": "Interlaced bands and endless loops drawn from Insular manuscript art and early medieval stone carving.",
+      "historical_era": "Ancient",
+      "hero_image": "assets/images/styles/celtic_knotwork_hero.png",
+      "origin": "Knot motifs appear in Book of Kells illuminations and Pictish standing stones, likely symbolizing eternity, loyalty, and the interconnectedness of clan lines. Tattoo revivals began in the 1990s alongside heritage pride movements.",
+      "technique": "Celtic revival tattooing walks a careful line between honoring archaeological sources and avoiding oversimplified fantasy kitsch detached from place and history.",
+      "gallery_images": [
+        {
+          "asset": "assets/images/workflow/workflow_step_00_prepare.png",
+          "caption": "Archival plate from early regional documentation.",
+          "reference_type": "historical_reference"
+        },
+        {
+          "asset": "assets/images/workflow/workflow_step_01_capture.png",
+          "caption": "Museum folio tracing motif evolution across decades.",
+          "reference_type": "historical_reference"
+        },
+        {
+          "asset": "assets/images/workflow/workflow_step_02_select.png",
+          "caption": "Contemporary studio work honoring traditional structure.",
+          "reference_type": "modern_interpretation"
+        }
+      ]
+    },
+    {
+      "id": "nordic-runes",
+      "name": "Nordic Runes & Symbolism",
+      "description": "Runestone geometry, valknut forms, and saga-era imagery reinterpreted through contemporary Nordic tattoo studios.",
+      "historical_era": "Ancient",
+      "hero_image": "assets/images/styles/nordic_runes_hero.png",
+      "origin": "Historic runes functioned as language, not merely decoration. Modern Nordic tattooers consult archaeological finds and sagas to avoid flattening sacred symbols into generic Viking aesthetic trends.",
+      "technique": "Scandinavian museums increasingly collaborate with tattoo historians to explain how runic literacy, ship burial art, and folk protection marks differ from pop-culture Viking branding.",
+      "gallery_images": [
+        {
+          "asset": "assets/images/workflow/workflow_step_01_capture.png",
+          "caption": "Archival plate from early regional documentation.",
+          "reference_type": "historical_reference"
+        },
+        {
+          "asset": "assets/images/workflow/workflow_step_02_select.png",
+          "caption": "Museum folio tracing motif evolution across decades.",
+          "reference_type": "historical_reference"
+        },
+        {
+          "asset": "assets/images/workflow/workflow_step_03_render.png",
+          "caption": "Contemporary studio work honoring traditional structure.",
+          "reference_type": "modern_interpretation"
+        }
+      ]
+    },
+    {
+      "id": "chicano-black-grey",
+      "name": "Chicano Black & Grey",
+      "description": "Photorealistic shading born in Mexican-American communities, blending religious iconography, lowrider culture, and fine single-needle gradation.",
+      "historical_era": "Modern",
+      "hero_image": "assets/images/styles/chicano_black_grey_hero.png",
+      "origin": "Chicano tattooing matured in East Los Angeles and prison art traditions before entering mainstream shops in the 1970s and 80s. Black-and-grey technique allowed narrative scenes on limited budgets and skin space.",
+      "technique": "The style documents barrio history, faith, and family memory. Contemporary artists emphasize community authorship against commercial appropriation of Chicano visual language.",
+      "gallery_images": [
+        {
+          "asset": "assets/images/workflow/workflow_step_02_select.png",
+          "caption": "Archival plate from early regional documentation.",
+          "reference_type": "historical_reference"
+        },
+        {
+          "asset": "assets/images/workflow/workflow_step_03_render.png",
+          "caption": "Museum folio tracing motif evolution across decades.",
+          "reference_type": "historical_reference"
+        },
+        {
+          "asset": "assets/images/workflow/workflow_step_04_share.png",
+          "caption": "Contemporary studio work honoring traditional structure.",
+          "reference_type": "modern_interpretation"
+        }
+      ]
+    },
+    {
+      "id": "watercolor-tattoo",
+      "name": "Watercolor Tattoo",
+      "description": "Soft-edge color washes that mimic painterly bleed while preserving readable linework beneath translucent layers.",
+      "historical_era": "Fine Line",
+      "hero_image": "assets/images/styles/watercolor_tattoo_hero.png",
+      "origin": "Watercolor effects entered tattooing from fine-art illustration in the early 2010s. Early debate questioned longevity; refined techniques now anchor color within structural outlines to improve aging.",
+      "technique": "Critics note the style debt to Impressionist and contemporary gallery painting, making it a useful case study in how tattooing absorbs art-history movements.",
+      "gallery_images": [
+        {
+          "asset": "assets/images/ink_chronicles.png",
+          "caption": "Archival plate from early regional documentation.",
+          "reference_type": "historical_reference"
+        },
+        {
+          "asset": "assets/images/artist_spotlight.png",
+          "caption": "Museum folio tracing motif evolution across decades.",
+          "reference_type": "historical_reference"
+        },
+        {
+          "asset": "assets/images/style_archive.png",
+          "caption": "Contemporary studio work honoring traditional structure.",
+          "reference_type": "modern_interpretation"
+        }
+      ]
+    },
+    {
+      "id": "fracture",
+      "name": "Blackwork",
+      "description": "Large-scale saturated black fields, geometric division, and negative-space storytelling with graphic clarity.",
+      "historical_era": "Modern",
+      "hero_image": "assets/images/ai_coach.png",
+      "origin": "Blackwork draws from tribal solid-fill traditions and modern abstract sculpture. Its resurgence parallels minimalism in gallery art and a collector preference for bold, legible silhouettes.",
+      "technique": "Global blackwork festivals now archive artist sketchbooks to show how regional black-fill methods share formal principles while differing in ritual context.",
+      "gallery_images": [
+        {
+          "asset": "assets/images/workflow/workflow_step_00_prepare.png",
+          "caption": "Archival plate from early regional documentation.",
+          "reference_type": "historical_reference"
+        },
+        {
+          "asset": "assets/images/workflow/workflow_step_01_capture.png",
+          "caption": "Museum folio tracing motif evolution across decades.",
+          "reference_type": "historical_reference"
+        },
+        {
+          "asset": "assets/images/workflow/workflow_step_02_select.png",
+          "caption": "Contemporary studio work honoring traditional structure.",
+          "reference_type": "modern_interpretation"
+        }
+      ]
+    },
+    {
+      "id": "dotwork-tattoo",
+      "name": "Dotwork",
+      "description": "Compositions built from stippled gradients and sacred-mathematical repetition, often associated with mandala and precision geometry.",
+      "historical_era": "Fine Line",
+      "hero_image": "assets/images/styles/dotwork_tattoo_hero.png",
+      "origin": "Dotwork technique slows application to individual punctures, creating tone through density rather than whip shading. It connects visually to pointillism and meditative craft practices.",
+      "technique": "Religious and spiritual symbols in dotwork require contextual reading. What reads as decoration in a studio may carry devotional meaning in its culture of origin.",
+      "gallery_images": [
+        {
+          "asset": "assets/images/workflow/workflow_step_01_capture.png",
+          "caption": "Archival plate from early regional documentation.",
+          "reference_type": "historical_reference"
+        },
+        {
+          "asset": "assets/images/workflow/workflow_step_02_select.png",
+          "caption": "Museum folio tracing motif evolution across decades.",
+          "reference_type": "historical_reference"
+        },
+        {
+          "asset": "assets/images/workflow/workflow_step_03_render.png",
+          "caption": "Contemporary studio work honoring traditional structure.",
+          "reference_type": "modern_interpretation"
+        }
+      ]
+    },
+    {
+      "id": "tebori-tattoo",
+      "name": "Tebori",
+      "description": "Hand-tapped Japanese application using bundled needles, prized for texture, saturation, and intimate artist-client rhythm.",
+      "historical_era": "Ancient",
+      "hero_image": "assets/images/styles/tebori_tattoo_hero.png",
+      "origin": "Tebori predates rotary machines and remains practiced by horishi who train for years under masters. The method influences color packing and line weight prized in collector communities worldwide.",
+      "technique": "Craft discussions now include tebori as intangible cultural technique, with apprenticeships documented as living heritage rather than nostalgic performance.",
+      "gallery_images": [
+        {
+          "asset": "assets/images/workflow/workflow_step_02_select.png",
+          "caption": "Archival plate from early regional documentation.",
+          "reference_type": "historical_reference"
+        },
+        {
+          "asset": "assets/images/workflow/workflow_step_03_render.png",
+          "caption": "Museum folio tracing motif evolution across decades.",
+          "reference_type": "historical_reference"
+        },
+        {
+          "asset": "assets/images/workflow/workflow_step_04_share.png",
+          "caption": "Contemporary studio work honoring traditional structure.",
+          "reference_type": "modern_interpretation"
+        }
+      ]
+    },
+    {
+      "id": "shadow-step",
+      "name": "Portrait Realism",
+      "description": "High-fidelity likeness and grayscale depth derived from photographic reference and academic figure study.",
+      "historical_era": "Modern",
+      "hero_image": "assets/images/ai_coach.png",
+      "origin": "Realism surged with improved needles, inks, and reference projection in the 2000s. Portrait tattooing demands anatomical literacy: bone structure, skin aging, and emotional micro-expression.",
+      "technique": "Memorial portraits in particular turn tattoo studios into sites of private mourning and public biography, blurring lines between photography, sculpture, and folk remembrance.",
+      "gallery_images": [
+        {
+          "asset": "assets/images/ink_chronicles.png",
+          "caption": "Archival plate from early regional documentation.",
+          "reference_type": "historical_reference"
+        },
+        {
+          "asset": "assets/images/artist_spotlight.png",
+          "caption": "Museum folio tracing motif evolution across decades.",
+          "reference_type": "historical_reference"
+        },
+        {
+          "asset": "assets/images/style_archive.png",
+          "caption": "Contemporary studio work honoring traditional structure.",
+          "reference_type": "modern_interpretation"
+        }
+      ]
+    },
+    {
+      "id": "neo-traditional-tattoo",
+      "name": "Neo-Traditional",
+      "description": "An expanded American Traditional vocabulary with richer palettes, art-nouveau curves, and illustrative storytelling.",
+      "historical_era": "Modern",
+      "hero_image": "assets/images/styles/neo_traditional_tattoo_hero.png",
+      "origin": "Neo-Traditional emerged as artists trained in classic bold-line rules then incorporated illustration-school composition, allowing larger narratives and ornamental framing.",
+      "technique": "The movement demonstrates how tattoo styles evolve: strict shop tradition absorbs academy technique without abandoning readable, time-tested structure.",
+      "gallery_images": [
+        {
+          "asset": "assets/images/workflow/workflow_step_00_prepare.png",
+          "caption": "Archival plate from early regional documentation.",
+          "reference_type": "historical_reference"
+        },
+        {
+          "asset": "assets/images/workflow/workflow_step_01_capture.png",
+          "caption": "Museum folio tracing motif evolution across decades.",
+          "reference_type": "historical_reference"
+        },
+        {
+          "asset": "assets/images/workflow/workflow_step_02_select.png",
+          "caption": "Contemporary studio work honoring traditional structure.",
+          "reference_type": "modern_interpretation"
+        }
+      ]
+    },
+    {
+      "id": "hand-poked-folk-tattoo",
+      "name": "Hand-Poked Folk",
+      "description": "Non-electric stick-and-poke methods preserved in folk rituals, prison art, and intentional slow-tattoo communities.",
+      "historical_era": "Tribal",
+      "hero_image": "assets/images/styles/hand_poked_folk_tattoo_hero.png",
+      "origin": "Hand-poking appears across cultures, from ceremonial tools to traveler kits. Its revival emphasizes autonomy, intimate pace, and rejection of industrial shop speed.",
+      "technique": "Ethnographic archives record hand-poked marks on pilgrimage routes and rites of passage, reminding collectors that tattoo history is often oral as much as visual.",
+      "gallery_images": [
+        {
+          "asset": "assets/images/workflow/workflow_step_01_capture.png",
+          "caption": "Archival plate from early regional documentation.",
+          "reference_type": "historical_reference"
+        },
+        {
+          "asset": "assets/images/workflow/workflow_step_02_select.png",
+          "caption": "Museum folio tracing motif evolution across decades.",
+          "reference_type": "historical_reference"
+        },
+        {
+          "asset": "assets/images/workflow/workflow_step_03_render.png",
+          "caption": "Contemporary studio work honoring traditional structure.",
+          "reference_type": "modern_interpretation"
+        }
+      ]
+    },
+    {
+      "id": "geometric-tattoo",
+      "name": "Sacred Geometry",
+      "description": "Platonic solids, golden-ratio constructions, and metaphysical diagrams translated into precise skin compositions.",
+      "historical_era": "Fine Line",
+      "hero_image": "assets/images/styles/geometric_tattoo_hero.png",
+      "origin": "Geometric sacred art links tattooing to Islamic tessellation, Hindu yantras, and European alchemical illustration. Precision demands mathematical planning rare in spontaneous flash work.",
+      "technique": "Scholars caution that geometry marketed as universal spirituality can erase specific religious contexts. Museum interpretation should name sources, not flatten them.",
+      "gallery_images": [
+        {
+          "asset": "assets/images/workflow/workflow_step_02_select.png",
+          "caption": "Archival plate from early regional documentation.",
+          "reference_type": "historical_reference"
+        },
+        {
+          "asset": "assets/images/workflow/workflow_step_03_render.png",
+          "caption": "Museum folio tracing motif evolution across decades.",
+          "reference_type": "historical_reference"
+        },
+        {
+          "asset": "assets/images/workflow/workflow_step_04_share.png",
+          "caption": "Contemporary studio work honoring traditional structure.",
+          "reference_type": "modern_interpretation"
+        }
+      ]
+    },
+    {
+      "id": "new-school-tattoo",
+      "name": "New School",
+      "description": "Bold outlines, exaggerated proportions, and saturated cartoon-inspired color drawn from graffiti, animation, and pop-culture illustration.",
+      "historical_era": "Modern",
+      "hero_image": "assets/images/styles/new_school_tattoo_hero.png",
+      "origin": "New School emerged in the late 1980s and 90s as artists pushed beyond American Traditional rules toward graffiti lettering, comic-book anatomy, and neon palettes. The style treats skin as a canvas for playful, high-energy character work.",
+      "technique": "Collectors value New School for its freedom of subject matter and expressive color blocking. Contemporary artists blend the look with anime, street art, and surrealism while keeping the thick outlines and dynamic composition that define the genre.",
+      "gallery_images": [
+        {
+          "asset": "assets/images/workflow/workflow_step_01_capture.png",
+          "caption": "Archival plate from early regional documentation.",
+          "reference_type": "historical_reference"
+        },
+        {
+          "asset": "assets/images/workflow/workflow_step_02_select.png",
+          "caption": "Museum folio tracing motif evolution across decades.",
+          "reference_type": "historical_reference"
+        },
+        {
+          "asset": "assets/images/workflow/workflow_step_03_render.png",
+          "caption": "Contemporary studio work honoring traditional structure.",
+          "reference_type": "modern_interpretation"
+        }
+      ]
+    }
+  ]
+}

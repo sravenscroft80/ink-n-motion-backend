@@ -1,0 +1,68 @@
+name: ink_n_motion
+description: "A new Flutter project."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  google_fonts: ^6.1.0
+  cupertino_icons: ^1.0.8
+  flutter_riverpod: ^2.6.1
+  camera: ^0.11.1
+  image_picker: ^1.1.2
+  shared_preferences: ^2.3.5
+  purchases_flutter: ^8.2.0
+  firebase_core: ^3.13.0
+  firebase_auth: ^5.5.2
+  cloud_firestore: ^5.6.6
+  dio: ^5.7.0
+  http: ^1.2.2
+  url_launcher: ^6.3.2
+  share_plus: ^13.1.0
+  path_provider: ^2.1.5
+  gal: ^2.3.2
+  video_player: ^2.9.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/data/discover_content.json
+    - assets/images/discover_hero.png
+    - assets/images/ink_chronicles.png
+    - assets/images/artist_spotlight.png
+    - assets/images/style_archive.png
+    - assets/images/ai_coach.png
+    - assets/images/fallback_article_image.png
+    - assets/images/default_artist_avatar.png
+    - assets/images/empty_museum_plate.png
+    - assets/images/styles/japanese_irezumi_hero.png
+    - assets/images/styles/polynesian_tatau_hero.png
+    - assets/images/styles/american_traditional_hero.png
+    - assets/images/styles/maori_ta_moko_hero.png
+    - assets/images/styles/celtic_knotwork_hero.png
+    # - assets/images/styles/nordic_runes_hero.png  # file missing — re-enable when added
+    - assets/images/styles/chicano_black_grey_hero.png
+    - assets/images/styles/watercolor_tattoo_hero.png
+    - assets/images/styles/dotwork_tattoo_hero.png
+    - assets/images/styles/geometric_tattoo_hero.png
+    - assets/images/styles/new_school_tattoo_hero.png
+    - assets/images/styles/neo_traditional_tattoo_hero.png
+    - assets/images/styles/tebori_tattoo_hero.png
+    - assets/images/styles/hand_poked_folk_tattoo_hero.png
+    - assets/images/workflow/workflow_step_00_prepare.png
+    - assets/images/workflow/workflow_step_01_capture.png
+    - assets/images/workflow/workflow_step_02_select.png
+    - assets/images/workflow/workflow_step_03_render.png
+    - assets/images/workflow/workflow_step_04_share.png
