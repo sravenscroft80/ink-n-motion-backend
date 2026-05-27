@@ -23,6 +23,14 @@ const STYLE_PROMPTS = {
     'Animate only the tattoo art on the skin. Ink pigment blooms and bleeds outward from the tattoo lines like watercolor on wet paper, expanding then retreating in slow waves. Colors deepen and soften rhythmically. The body and background remain completely still. Cinematic, 10 seconds, seamless loop.',
   shadow_reaper:
     'Animate only the tattoo art on the skin. Deep shadows emerge and recede within the tattoo, dark gothic forms shifting and breathing with a haunting energy. Black ink deepens to near void then releases. The body and background remain completely still. Cinematic, 10 seconds, seamless loop.',
+  japanese_wave:
+    'Animate only the tattoo art on the skin. The linework flows like traditional Japanese brush strokes, ink moves like Hokusai waves rising and receding, bold forms breathe with ancient energy. Wind bars flutter, water churns within the design. The body and background remain completely still. Cinematic, 10 seconds, seamless loop.',
+  alex_grey:
+    'Animate only the tattoo art on the skin. Sacred geometry patterns pulse and activate within the linework, visionary light grids emerge, inter-dimensional energy flows through the design like Alex Grey artwork coming alive. Chakra light radiates from focal points. The body and background remain completely still. Cinematic, 10 seconds, seamless loop.',
+  steampunk:
+    'Animate only the tattoo art on the skin. Intricate gears rotate within the linework, copper and brass tones catch warm light, delicate steam wisps rise from the ink. Mechanical energy pulses through every detail. The body and background remain completely still. Cinematic, 10 seconds, seamless loop.',
+  horror:
+    'Animate only the tattoo art on the skin. Dark ink drips and bleeds slowly from the linework, veins pulse beneath the design, sinister shadows breathe and shift. A haunting malevolent energy radiates from within. The body and background remain completely still. Cinematic, 10 seconds, seamless loop.',
   default:
     'Animate only the tattoo art on the skin. Cinematic flowing ink movement, dynamic artistic energy transforming the design. The body and background remain completely still. 10 seconds, seamless loop.',
 };
