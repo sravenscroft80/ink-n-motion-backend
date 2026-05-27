@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 import 'package:ink_n_motion/screens/coverup_studio_picker.dart'
     if (dart.library.html) 'package:ink_n_motion/screens/coverup_studio_picker_web.dart'
     if (dart.library.io) 'package:ink_n_motion/screens/coverup_studio_picker_io.dart';
@@ -275,16 +276,20 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
     );
   }
 
-  void _saveVideo() {
+  Future<void> _saveVideo() async {
     if (_videoUrl == null) return;
-    _showNotice(
-      'Copy this link to download:\n$_videoUrl',
-      title: 'Video Ready',
-    );
+    final uri = Uri.parse(_videoUrl!);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
   }
 
-  void _shareVideo() {
-    _showNotice('Share coming soon');
+  Future<void> _shareVideo() async {
+    if (_videoUrl == null) return;
+    final uri = Uri.parse(_videoUrl!);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
   }
 
   @override
@@ -662,47 +667,50 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    Container(
-                      height: 300,
-                      decoration: BoxDecoration(
-                        color: _surface,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: _border),
-                      ),
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              CupertinoIcons.play_circle_fill,
-                              color: _gold,
-                              size: 64,
-                            ),
-                            const SizedBox(height: 12),
-                            const Text(
-                              'Video Ready!',
-                              style: TextStyle(
-                                color: CupertinoColors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
+                    GestureDetector(
+                      onTap: _saveVideo,
+                      child: Container(
+                        height: 300,
+                        decoration: BoxDecoration(
+                          color: _surface,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: _border),
+                        ),
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(
+                                CupertinoIcons.play_circle_fill,
+                                color: _gold,
+                                size: 64,
                               ),
-                            ),
-                            const SizedBox(height: 4),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16),
-                              child: Text(
-                                _videoUrl!,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  color: _snippetGrey,
-                                  fontSize: 11,
+                              const SizedBox(height: 12),
+                              const Text(
+                                'Video Ready!',
+                                style: TextStyle(
+                                  color: CupertinoColors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 4),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 16),
+                                child: Text(
+                                  _videoUrl!,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    color: _snippetGrey,
+                                    fontSize: 11,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
