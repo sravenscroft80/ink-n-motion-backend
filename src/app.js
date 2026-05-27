@@ -2,6 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const generateVideoRouter = require('./routes/generateVideo');
 const generateMockupRouter = require('./routes/generateMockup');
+const apiRoutes = require('./routes/apiRoutes');
 const studioGenerateRouter = require('./studio/generateVideo');
 const { MASK_DIR } = require('./services/tattooMaskEngine');
 const { logger } = require('./utils/logger');
@@ -33,6 +34,7 @@ app.get('/health', (_req, res) => {
 
 /** Routes */
 app.use('/generate-mockup', generateMockupRouter);
+app.use('/api', apiRoutes);
 app.use('/v1/generate', generateVideoRouter);
 app.use('/v1/studio/generate', studioGenerateRouter);
 app.use('/uploads/masks', express.static(MASK_DIR));
