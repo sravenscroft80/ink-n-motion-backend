@@ -10,32 +10,22 @@ const upload = multer({
   limits: { fileSize: 20 * 1024 * 1024 },
 });
 
-const STYLE_ID_MAP = {
-  fluid: 'watercolor',
-  sparkle: 'animated_pop_3d',
-  'neon pulse': 'cyberpunk_neon_glow',
-  cyberpunk: 'cyberpunk_neon_glow',
-  watercolor: 'watercolor',
-  'dark energy': 'dark_art',
-};
-
 const STYLE_PROMPTS = {
-  cyberpunk_neon_glow:
-    'cyberpunk tattoo animation, electric neon lines pulsing, glowing circuitry flowing, futuristic energy radiating',
-  animated_pop_3d:
-    'bold pop art tattoo animation, vivid colors popping, 3D depth pulsing, dynamic comic energy bursting',
-  watercolor:
-    'watercolor tattoo animation, ink bleeds blooming outward, soft pigment clouds drifting, fluid color washes',
-  dark_art:
-    'dark art tattoo animation, shadowy forms emerging, gothic details alive, ethereal dark energy flowing',
+  ember_glow:
+    'Animate only the tattoo art on the skin. Warm golden and amber light pulses gently from within the linework and shading. The ink glows like embers breathing in the dark. The body and background remain completely still. Cinematic, 10 seconds, seamless loop.',
+  fluid_flow:
+    'Animate only the tattoo art on the skin. The ink flows with slow organic liquid motion, rippling and breathing as if alive beneath the surface. Shadows and highlights shift fluidly. The body and background remain completely still. Cinematic, 10 seconds, seamless loop.',
+  mystic_drift:
+    'Animate only the tattoo art on the skin. Ink elements drift and swirl with an ethereal energy, like dark smoke curling in slow motion. Fine details shimmer faintly. The body and background remain completely still. Cinematic, 10 seconds, seamless loop.',
+  electric_storm:
+    'Animate only the tattoo art on the skin. Bright neon electricity and energy arcs trace along the linework, crackling between details like a tesla coil. The ink pulses with electric blue and white light. The body and background remain completely still. Cinematic, 10 seconds, seamless loop.',
+  watercolor_bloom:
+    'Animate only the tattoo art on the skin. Ink pigment blooms and bleeds outward from the tattoo lines like watercolor on wet paper, expanding then retreating in slow waves. Colors deepen and soften rhythmically. The body and background remain completely still. Cinematic, 10 seconds, seamless loop.',
+  shadow_reaper:
+    'Animate only the tattoo art on the skin. Deep shadows emerge and recede within the tattoo, dark gothic forms shifting and breathing with a haunting energy. Black ink deepens to near void then releases. The body and background remain completely still. Cinematic, 10 seconds, seamless loop.',
   default:
-    'cinematic tattoo animation, flowing ink movement, dynamic energy, artistic transformation',
+    'Animate only the tattoo art on the skin. Cinematic flowing ink movement, dynamic artistic energy transforming the design. The body and background remain completely still. 10 seconds, seamless loop.',
 };
-
-function mapStyleToStyleId(style) {
-  const key = (style || '').trim().toLowerCase();
-  return STYLE_ID_MAP[key] || 'default';
-}
 
 function getStylePrompt(styleId) {
   return STYLE_PROMPTS[styleId] || STYLE_PROMPTS.default;
@@ -54,7 +44,7 @@ router.post('/generate-video', upload.single('image'), async (req, res) => {
     }
 
     const style = req.body.style || '';
-    const styleId = mapStyleToStyleId(style);
+    const styleId = (style || 'default').trim().toLowerCase();
     const durationSeconds = parseDurationSeconds(req.body.duration);
     const imageBase64 = req.file.buffer.toString('base64');
 

@@ -91,7 +91,7 @@ async function submitKlingJob({ imageUrl, durationSeconds = 5, stylePrompt = '' 
     image,
     prompt: stylePrompt || 'cinematic tattoo animation, flowing ink movement',
     duration: String(durationSeconds),
-    cfg_scale: 0.5,
+    cfg_scale: 0.7,
     mode: 'std',
   };
 
