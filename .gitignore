@@ -19,6 +19,8 @@ windows/
 
 # Firebase sensitive config - never commit these
 android/app/google-services.json
+android/local.properties
+android/.gradle/
 ios/Runner/GoogleService-Info.plist
 
 # RevenueCat / API keys
