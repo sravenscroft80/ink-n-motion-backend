@@ -27,6 +27,7 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
   final TextEditingController _promptController = TextEditingController();
 
   bool _isGenerating = false;
+  String _loadStatus = '';
   String? _generatedImageUrl;
   String? _errorMessage;
 
@@ -49,7 +50,17 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
       _isGenerating = true;
       _errorMessage = null;
       _generatedImageUrl = null;
+      _loadStatus = 'Generating your concept...';
     });
+
+    unawaited(
+      Future<void>.delayed(const Duration(seconds: 3), () {
+        if (!mounted || !_isGenerating) return;
+        setState(() {
+          _loadStatus = 'Rendering final image...';
+        });
+      }),
+    );
 
     try {
       final response = await http
@@ -89,9 +100,31 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
       });
     } finally {
       if (mounted) {
-        setState(() => _isGenerating = false);
+        setState(() {
+          _isGenerating = false;
+          _loadStatus = '';
+        });
       }
     }
+  }
+
+  void _showAnimateComingSoon() {
+    showCupertinoDialog<void>(
+      context: context,
+      builder: (ctx) => CupertinoAlertDialog(
+        title: const Text('Coming Soon'),
+        content: const Text(
+          'Animate My Ink is available in the CREATE section on the home screen.',
+        ),
+        actions: [
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Got it'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showNotice(String message) {
@@ -185,7 +218,7 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
                       Icon(CupertinoIcons.sparkles, color: _gold, size: 14),
                       SizedBox(width: 6),
                       Text(
-                        '1 free render per day  ·  No account needed',
+                        '1 free render per day  ·  Pro unlocks 3 variations',
                         style: TextStyle(
                           color: _gold,
                           fontSize: 12,
@@ -249,6 +282,18 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
                       ),
                     ),
                   ),
+                  if (_isGenerating) ...[
+                    const SizedBox(height: 8),
+                    Center(
+                      child: Text(
+                        _loadStatus,
+                        style: const TextStyle(
+                          color: _gold,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ],
                   if (_errorMessage != null) ...[
                     const SizedBox(height: 8),
                     Container(
@@ -331,12 +376,49 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
                         ),
                         _ResultActionButton(
                           icon: CupertinoIcons.refresh,
-                          label: 'Variations',
+                          label: 'New Concept',
                           backgroundColor: _gold,
                           foregroundColor: CupertinoColors.black,
                           onTap: _isGenerating ? null : _generateConcept,
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 20),
+                    Container(
+                      height: 1,
+                      color: _border,
+                    ),
+                    const SizedBox(height: 20),
+                    const Text(
+                      'Like this concept?',
+                      style: TextStyle(
+                        color: CupertinoColors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    GestureDetector(
+                      onTap: _showAnimateComingSoon,
+                      child: Container(
+                        width: double.infinity,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: CupertinoColors.transparent,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: _gold),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            '✦  Animate This Concept',
+                            style: TextStyle(
+                              color: _gold,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 12),
                     const Center(

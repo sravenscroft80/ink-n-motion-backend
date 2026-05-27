@@ -41,6 +41,8 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
   String? _selectedImageName;
   String _selectedStyle = 'Fluid';
   bool _isGenerating = false;
+  String? _taskId;
+  String? _pollStatus;
   String? _videoUrl;
   String? _errorMessage;
 
@@ -65,6 +67,8 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
       _isGenerating = true;
       _errorMessage = null;
       _videoUrl = null;
+      _taskId = null;
+      _pollStatus = 'Submitting...';
     });
 
     try {
@@ -85,27 +89,82 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
         );
 
       final streamedResponse =
-          await request.send().timeout(const Duration(seconds: 120));
+          await request.send().timeout(const Duration(seconds: 30));
       final response = await http.Response.fromStream(streamedResponse);
 
       if (!mounted) return;
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body) as Map<String, dynamic>;
+      if (response.statusCode != 200 && response.statusCode != 202) {
+        throw Exception(
+          'Server error (${response.statusCode}). Please try again.',
+        );
+      }
+
+      final submitData = jsonDecode(response.body) as Map<String, dynamic>;
+      final taskId = (submitData['taskId'] ?? submitData['task_id']) as String?;
+      if (taskId == null || taskId.isEmpty) {
+        throw Exception('No task ID returned');
+      }
+
+      setState(() {
+        _taskId = taskId;
+        _pollStatus = 'Queued — waiting for Kling...';
+      });
+
+      String? videoUrl;
+      for (var i = 1; i <= 40; i++) {
+        await Future<void>.delayed(const Duration(seconds: 5));
+        if (!mounted) return;
+
+        final pollResponse = await http.get(
+          Uri.parse(
+            'https://ink-n-motion-backend.onrender.com/api/generate-video-status/$_taskId',
+          ),
+        );
+
+        if (!mounted) return;
+
+        if (pollResponse.statusCode != 200) {
+          throw Exception(
+            'Server error (${pollResponse.statusCode}). Please try again.',
+          );
+        }
+
+        final pollData = jsonDecode(pollResponse.body) as Map<String, dynamic>;
+        final status = pollData['status'] as String?;
+        final polledVideoUrl =
+            (pollData['videoUrl'] ?? pollData['video_url']) as String?;
+
+        if (status == 'succeed' && polledVideoUrl != null) {
+          videoUrl = polledVideoUrl;
+          setState(() {
+            _videoUrl = videoUrl;
+            _pollStatus = 'Complete!';
+          });
+          break;
+        }
+
+        if (status == 'failed') {
+          throw Exception('Kling render failed');
+        }
+
         setState(() {
-          _videoUrl = (data['videoUrl'] ?? data['url']) as String?;
+          _pollStatus = 'Processing... ($i/40)';
         });
-      } else {
-        setState(() {
-          _errorMessage =
-              'Server error (${response.statusCode}). Please try again.';
-        });
+      }
+
+      if (videoUrl == null) {
+        throw Exception('Timed out waiting for video');
       }
     } on TimeoutException {
       if (!mounted) return;
       setState(() {
-        _errorMessage =
-            'Render timed out — Kling videos can take up to 2 minutes';
+        _errorMessage = 'Request timed out submitting to Kling';
+      });
+    } on Exception catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _errorMessage = e.toString().replaceAll('Exception: ', '');
       });
     } catch (_) {
       if (!mounted) return;
@@ -395,16 +454,16 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
                       ),
                       child: Center(
                         child: _isGenerating
-                            ? const Row(
+                            ? Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  CupertinoActivityIndicator(
+                                  const CupertinoActivityIndicator(
                                     color: CupertinoColors.black,
                                   ),
-                                  SizedBox(width: 10),
+                                  const SizedBox(width: 10),
                                   Text(
-                                    'Rendering... this takes ~60s',
-                                    style: TextStyle(
+                                    _pollStatus ?? 'Submitting...',
+                                    style: const TextStyle(
                                       color: CupertinoColors.black,
                                       fontWeight: FontWeight.bold,
                                     ),

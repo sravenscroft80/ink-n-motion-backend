@@ -1,8 +1,127 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ink_n_motion/state/providers.dart';
 import 'package:ink_n_motion/utils/design_tokens.dart';
 import 'package:ink_n_motion/widgets/video/ink_network_video_player.dart';
+
+void _shareVideo(BuildContext context, String path) {
+  showCupertinoModalPopup<void>(
+    context: context,
+    builder: (ctx) => CupertinoActionSheet(
+      title: const Text('Share Your Animation'),
+      actions: [
+        CupertinoActionSheetAction(
+          onPressed: () async {
+            Navigator.of(ctx).pop();
+            await Clipboard.setData(ClipboardData(text: path));
+            if (!context.mounted) return;
+            showCupertinoDialog<void>(
+              context: context,
+              builder: (dialogCtx) => CupertinoAlertDialog(
+                content: const Text('Link copied!'),
+                actions: [
+                  CupertinoDialogAction(
+                    isDefaultAction: true,
+                    onPressed: () => Navigator.of(dialogCtx).pop(),
+                    child: const Text('OK'),
+                  ),
+                ],
+              ),
+            );
+          },
+          child: const Text('Copy Link'),
+        ),
+        CupertinoActionSheetAction(
+          onPressed: () {
+            Navigator.of(ctx).pop();
+            showCupertinoDialog<void>(
+              context: context,
+              builder: (dialogCtx) => CupertinoAlertDialog(
+                content: const Text(
+                  'Download first, then share to Instagram',
+                ),
+                actions: [
+                  CupertinoDialogAction(
+                    isDefaultAction: true,
+                    onPressed: () => Navigator.of(dialogCtx).pop(),
+                    child: const Text('OK'),
+                  ),
+                ],
+              ),
+            );
+          },
+          child: const Text('Instagram Stories'),
+        ),
+        CupertinoActionSheetAction(
+          onPressed: () {
+            Navigator.of(ctx).pop();
+            showCupertinoDialog<void>(
+              context: context,
+              builder: (dialogCtx) => CupertinoAlertDialog(
+                content: const Text('Download first, then share to TikTok'),
+                actions: [
+                  CupertinoDialogAction(
+                    isDefaultAction: true,
+                    onPressed: () => Navigator.of(dialogCtx).pop(),
+                    child: const Text('OK'),
+                  ),
+                ],
+              ),
+            );
+          },
+          child: const Text('TikTok'),
+        ),
+        CupertinoActionSheetAction(
+          onPressed: () async {
+            Navigator.of(ctx).pop();
+            await Clipboard.setData(ClipboardData(text: path));
+            if (!context.mounted) return;
+            showCupertinoDialog<void>(
+              context: context,
+              builder: (dialogCtx) => CupertinoAlertDialog(
+                content: const Text('Link copied — paste in X'),
+                actions: [
+                  CupertinoDialogAction(
+                    isDefaultAction: true,
+                    onPressed: () => Navigator.of(dialogCtx).pop(),
+                    child: const Text('OK'),
+                  ),
+                ],
+              ),
+            );
+          },
+          child: const Text('X (Twitter)'),
+        ),
+        CupertinoActionSheetAction(
+          onPressed: () async {
+            Navigator.of(ctx).pop();
+            await Clipboard.setData(ClipboardData(text: path));
+            if (!context.mounted) return;
+            showCupertinoDialog<void>(
+              context: context,
+              builder: (dialogCtx) => CupertinoAlertDialog(
+                content: const Text('Link copied — paste in Facebook'),
+                actions: [
+                  CupertinoDialogAction(
+                    isDefaultAction: true,
+                    onPressed: () => Navigator.of(dialogCtx).pop(),
+                    child: const Text('OK'),
+                  ),
+                ],
+              ),
+            );
+          },
+          child: const Text('Facebook'),
+        ),
+      ],
+      cancelButton: CupertinoActionSheetAction(
+        onPressed: () => Navigator.of(ctx).pop(),
+        child: const Text('Cancel'),
+      ),
+    ),
+  );
+}
 
 class GalleryScreen extends ConsumerWidget {
   const GalleryScreen({super.key});
@@ -139,7 +258,7 @@ class _GalleryEmptyState extends StatelessWidget {
             ),
             const SizedBox(height: InkSpacing.lg),
             Text(
-              'No animations yet.',
+              'Your Gallery is Empty',
               style: InkTypography.title3.copyWith(
                 color: InkColors.textPrimary,
                 fontWeight: FontWeight.w700,
@@ -148,7 +267,7 @@ class _GalleryEmptyState extends StatelessWidget {
             ),
             const SizedBox(height: InkSpacing.sm),
             Text(
-              'Head to Motion Studio, upload your tattoo photo, pick a style and animate it. Your saved videos will live here.',
+              'Render your first tattoo animation in the CREATE section.',
               style: InkTypography.subhead.copyWith(
                 color: InkColors.textSecondary,
                 height: 1.5,
@@ -178,7 +297,7 @@ class _GalleryEmptyState extends StatelessWidget {
                   ),
                   const SizedBox(width: InkSpacing.xs),
                   Text(
-                    'Tap Studio below to get started',
+                    '✦ Tap CREATE to get started',
                     style: InkTypography.caption1.copyWith(
                       color: InkColors.accentGold,
                       fontWeight: FontWeight.w600,
@@ -264,6 +383,26 @@ class _GalleryVideoTile extends StatelessWidget {
                     CupertinoIcons.play_fill,
                     size: 20,
                     color: accent,
+                  ),
+                ),
+              ),
+
+              Positioned(
+                top: 8,
+                left: 8,
+                child: GestureDetector(
+                  onTap: () => _shareVideo(context, path),
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: InkColors.accentGold,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      CupertinoIcons.share,
+                      color: CupertinoColors.black,
+                      size: 14,
+                    ),
                   ),
                 ),
               ),

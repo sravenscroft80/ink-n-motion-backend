@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show ScaffoldMessenger, SnackBar;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ink_n_motion/screens/legal/about_screen.dart';
 import 'package:ink_n_motion/screens/legal/privacy_policy_screen.dart';
@@ -32,15 +31,44 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     pushCupertino(context, const PaywallCreditPurchaseScreen());
   }
 
-  void _showSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
+  void _showAlert(String message) {
+    showCupertinoDialog<void>(
+      context: context,
+      builder: (ctx) => CupertinoAlertDialog(
+        content: Text(message),
+        actions: [
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _rateApp() {
+    showCupertinoDialog<void>(
+      context: context,
+      builder: (ctx) => CupertinoAlertDialog(
+        title: const Text('Rate Ink-N-Motion'),
+        content: const Text(
+          "We'd love your feedback! Rating will be available when the app launches on the App Store.",
+        ),
+        actions: [
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Got it'),
+          ),
+        ],
+      ),
     );
   }
 
   Future<void> _restorePurchases() async {
     if (!BillingService.isConfigured) {
-      _showSnackBar('Restore is only available on iOS and Android');
+      _showAlert('Restore is only available on iOS and Android');
       return;
     }
 
@@ -52,9 +80,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       if (customerInfo != null) {
         await ref.read(appStateProvider.notifier).syncPremiumFromRevenueCat();
         if (!mounted) return;
-        _showSnackBar('Purchases restored successfully.');
+        _showAlert('Purchases restored successfully.');
       } else {
-        _showSnackBar('No purchases found to restore.');
+        _showAlert('No purchases found to restore.');
       }
     } finally {
       if (mounted) setState(() => _isRestoring = false);
@@ -65,7 +93,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final uri = Uri.parse('https://labrhood.com');
     final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
     if (!launched && mounted) {
-      _showSnackBar('Unable to open community link.');
+      _showAlert('Unable to open community link.');
     }
   }
 
@@ -81,7 +109,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final uri = Uri.parse('mailto:support@ink-n-motion.com');
     final launched = await launchUrl(uri);
     if (!launched && mounted) {
-      _showSnackBar('Unable to open email client.');
+      _showAlert('Unable to open email client.');
     }
   }
 
@@ -217,7 +245,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 CupertinoListTile(
                   title: const Text('Rate the App'),
                   trailing: const CupertinoListTileChevron(),
-                  onTap: () => _showSnackBar('Coming soon'),
+                  onTap: _rateApp,
                 ),
               ],
             ),
@@ -300,46 +328,66 @@ class _AccountProfileHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: InkSpacing.sm),
-      child: Row(
-        children: [
-          Container(
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: gold, width: 2),
-              color: InkColors.backgroundElevated,
+    return GestureDetector(
+      onTap: () {
+        showCupertinoDialog<void>(
+          context: context,
+          builder: (ctx) => CupertinoAlertDialog(
+            title: const Text('Sign In'),
+            content: const Text(
+              'Account sign-in coming soon. Your data is saved locally for now.',
             ),
-            child: Icon(
-              CupertinoIcons.person_fill,
-              color: gold,
-              size: 28,
-            ),
+            actions: [
+              CupertinoDialogAction(
+                isDefaultAction: true,
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: const Text('OK'),
+              ),
+            ],
           ),
-          const SizedBox(width: InkSpacing.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Ink Master',
-                  style: InkTypography.headline.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: InkSpacing.xs),
-                Text(
-                  'Tap to sign in',
-                  style: InkTypography.subhead.copyWith(
-                    color: InkColors.textSecondary,
-                  ),
-                ),
-              ],
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: InkSpacing.sm),
+        child: Row(
+          children: [
+            Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: gold, width: 2),
+                color: InkColors.backgroundElevated,
+              ),
+              child: Icon(
+                CupertinoIcons.person_fill,
+                color: gold,
+                size: 28,
+              ),
             ),
-          ),
-        ],
+            const SizedBox(width: InkSpacing.md),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Ink Master',
+                    style: InkTypography.headline.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: InkSpacing.xs),
+                  Text(
+                    'Tap to sign in',
+                    style: InkTypography.subhead.copyWith(
+                      color: InkColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -351,11 +399,11 @@ class _CreditsInfoCard extends StatelessWidget {
   final Color gold;
 
   static const _lines = [
-    '1 AI Concept Image = 1 Credit',
-    '5-Second Animation = 2 Credits',
-    '10-Second Animation = 4 Credits',
-    'Free users: 1 concept per day + 10 starter credits',
-    'Ink Plus subscribers: 30 premium renders/month, unlimited concepts, no watermark',
+    '1 AI Concept Render = 1 token (1 free per day)',
+    '10-Second Animation = 10 tokens (first one free lifetime)',
+    'Coverup Studio Render = 3 tokens (first one free lifetime)',
+    'Referral reward: +10 tokens per friend who signs up',
+    'Social share reward: +5 tokens (one time)',
   ];
 
   @override
