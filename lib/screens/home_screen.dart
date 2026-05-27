@@ -57,8 +57,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const _DiscoverWelcomeTypewriter(),
-            _DiscoverImmersiveHero(viewportHeight: viewportHeight),
+            SizedBox(
+              height: viewportHeight * 0.42,
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: _DiscoverImmersiveHero(viewportHeight: viewportHeight),
+                  ),
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    top: 0,
+                    child: const _DiscoverWelcomeTypewriter(),
+                  ),
+                ],
+              ),
+            ),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: InkSpacing.md),
               child: Text(
@@ -209,7 +223,7 @@ class _DiscoverWelcomeTypewriterState extends State<_DiscoverWelcomeTypewriter> 
     return ConstrainedBox(
       constraints: const BoxConstraints(minHeight: 140),
       child: Container(
-        padding: const EdgeInsets.fromLTRB(24, 16, 24, 48),
+        padding: const EdgeInsets.fromLTRB(24, 56, 24, 0),
         color: Colors.transparent,
         child: Column(
           children: [
@@ -269,40 +283,37 @@ class _DiscoverImmersiveHero extends StatelessWidget {
     final cacheWidth = (screenWidth * devicePixelRatio).round();
     final cacheHeight = (heroHeight * devicePixelRatio).round();
 
-    return Transform.translate(
-      offset: Offset(0, -bleed),
-      child: SizedBox(
-        width: double.infinity,
-        height: heroHeight,
-        child: ClipRect(
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              Image.asset(
-                _heroImageAsset,
-                fit: BoxFit.cover,
-                alignment: Alignment.center,
-                filterQuality: FilterQuality.high,
-                cacheWidth: cacheWidth,
-                cacheHeight: cacheHeight,
-                gaplessPlayback: true,
-              ),
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      CupertinoColors.black.withValues(alpha: 0.18),
-                      CupertinoColors.black.withValues(alpha: 0.28),
-                      InkColors.backgroundPrimary,
-                    ],
-                    stops: const [0.0, 0.55, 1.0],
-                  ),
+    return SizedBox(
+      width: double.infinity,
+      height: heroHeight,
+      child: ClipRect(
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.asset(
+              _heroImageAsset,
+              fit: BoxFit.cover,
+              alignment: Alignment.center,
+              filterQuality: FilterQuality.high,
+              cacheWidth: cacheWidth,
+              cacheHeight: cacheHeight,
+              gaplessPlayback: true,
+            ),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    CupertinoColors.black.withValues(alpha: 0.18),
+                    CupertinoColors.black.withValues(alpha: 0.28),
+                    InkColors.backgroundPrimary,
+                  ],
+                  stops: const [0.0, 0.55, 1.0],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
