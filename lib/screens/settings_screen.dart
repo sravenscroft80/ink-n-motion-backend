@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ink_n_motion/screens/legal/about_screen.dart';
@@ -7,6 +8,7 @@ import 'package:ink_n_motion/screens/legal/terms_of_service_screen.dart';
 import 'package:ink_n_motion/screens/paywall_credit_purchase_screen.dart';
 import 'package:ink_n_motion/screens/refund_flow_screen.dart';
 import 'package:ink_n_motion/services/billing_service.dart';
+import 'package:ink_n_motion/services/firestore_wallet_service.dart';
 import 'package:ink_n_motion/state/app_state.dart';
 import 'package:ink_n_motion/state/providers.dart';
 import 'package:ink_n_motion/utils/design_tokens.dart';
@@ -26,6 +28,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   static const Color _gold = Color(0xFFD4A017);
 
   bool _isRestoring = false;
+
+  Stream<InkWallet?> get _walletStream {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return const Stream.empty();
+    return FirestoreWalletService.instance.watchWallet(uid);
+  }
 
   void _openPaywall() {
     pushCupertino(context, const PaywallCreditPurchaseScreen());
@@ -140,15 +148,28 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             child: CupertinoListSection.insetGrouped(
               backgroundColor: InkColors.backgroundPrimary,
               children: [
-                CupertinoListTile(
-                  leading: Icon(
-                    CupertinoIcons.money_dollar_circle_fill,
-                    color: _gold,
-                  ),
-                  title: const Text('Credit Balance'),
-                  additionalInfo: Text('${appState.creditsBalance}'),
-                  trailing: const CupertinoListTileChevron(),
-                  onTap: _openPaywall,
+                StreamBuilder<InkWallet?>(
+                  stream: _walletStream,
+                  builder: (context, snapshot) {
+                    final wallet = snapshot.data;
+                    final subTokens = wallet?.subscriptionTokens ?? 0;
+                    final purchTokens = wallet?.purchasedTokens ?? 0;
+                    final total = subTokens + purchTokens;
+                    final balanceLabel = subTokens > 0 && purchTokens > 0
+                        ? '$total ($subTokens + $purchTokens)'
+                        : '$total';
+
+                    return CupertinoListTile(
+                      leading: Icon(
+                        CupertinoIcons.money_dollar_circle_fill,
+                        color: _gold,
+                      ),
+                      title: const Text('Credit Balance'),
+                      additionalInfo: Text(balanceLabel),
+                      trailing: const CupertinoListTileChevron(),
+                      onTap: _openPaywall,
+                    );
+                  },
                 ),
                 CupertinoListTile(
                   title: const Text('Subscription'),

@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ink_n_motion/screens/studio_screen.dart';
+import 'package:ink_n_motion/screens/create_hub_screen.dart';
 import 'package:ink_n_motion/screens/gallery_screen.dart';
 import 'package:ink_n_motion/screens/home_screen.dart';
 import 'package:ink_n_motion/state/providers.dart';
@@ -69,7 +69,7 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
                   ),
                   BottomNavigationBarItem(
                     icon: Icon(CupertinoIcons.wand_stars),
-                    label: 'Studio',
+                    label: 'Create',
                   ),
                   BottomNavigationBarItem(
                     icon: Icon(CupertinoIcons.photo_on_rectangle),
@@ -82,7 +82,7 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
                   case 0:
                     return const HomeScreen();
                   case 1:
-                    return const StudioScreen();
+                    return const CreateHubScreen();
                   case 2:
                     return const GalleryScreen();
                   default:

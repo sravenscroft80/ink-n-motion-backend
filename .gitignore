@@ -8,3 +8,18 @@ uploads/
 # Keep Render blueprint and lockfile in version control for CI/CD
 !render.yaml
 !package-lock.json
+
+# Flutter generated
+build/
+.dart_tool/
+.flutter-plugins-dependencies
+linux/
+macos/
+windows/
+
+# Firebase sensitive config - never commit these
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+
+# RevenueCat / API keys
+config/app.env

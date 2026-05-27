@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:ink_n_motion/services/firestore_wallet_service.dart';
 
 /// Keeps an anonymous auth session and exposes ID tokens for API calls.
 class FirebaseAuthService {
@@ -7,15 +8,6 @@ class FirebaseAuthService {
 
   final FirebaseAuth? _injectedAuth;
   bool _initialized = false;
-
-  FirebaseAuth get _auth {
-    try {
-      return _injectedAuth ?? FirebaseAuth.instance;
-    } catch (e) {
-      debugPrint('FirebaseAuth.instance unavailable: $e');
-      rethrow;
-    }
-  }
 
   FirebaseAuth? get _authSafe {
     try {
@@ -76,13 +68,20 @@ class FirebaseAuthService {
       if (auth == null) return null;
 
       final existing = auth.currentUser;
-      if (existing != null) return existing;
+      if (existing != null) {
+        await FirestoreWalletService.instance.initializeWallet(existing.uid);
+        return existing;
+      }
 
       final credential = await auth.signInAnonymously();
       debugPrint(
         'FirebaseAuthService: signed in anonymously uid=${credential.user?.uid}',
       );
-      return credential.user;
+      final user = credential.user;
+      if (user != null) {
+        await FirestoreWalletService.instance.initializeWallet(user.uid);
+      }
+      return user;
     } catch (e, stackTrace) {
       debugPrint('FirebaseAuthService.ensureSignedIn failed: $e');
       debugPrint('$stackTrace');
