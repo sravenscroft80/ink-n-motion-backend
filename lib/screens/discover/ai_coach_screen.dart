@@ -108,25 +108,6 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
     }
   }
 
-  void _showAnimateComingSoon() {
-    showCupertinoDialog<void>(
-      context: context,
-      builder: (ctx) => CupertinoAlertDialog(
-        title: const Text('Coming Soon'),
-        content: const Text(
-          'Animate My Ink is available in the CREATE section on the home screen.',
-        ),
-        actions: [
-          CupertinoDialogAction(
-            isDefaultAction: true,
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Got it'),
-          ),
-        ],
-      ),
-    );
-  }
-
   void _showNotice(String message) {
     showCupertinoDialog<void>(
       context: context,
@@ -382,54 +363,6 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
                           onTap: _isGenerating ? null : _generateConcept,
                         ),
                       ],
-                    ),
-                    const SizedBox(height: 20),
-                    Container(
-                      height: 1,
-                      color: _border,
-                    ),
-                    const SizedBox(height: 20),
-                    const Text(
-                      'Like this concept?',
-                      style: TextStyle(
-                        color: CupertinoColors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    GestureDetector(
-                      onTap: _showAnimateComingSoon,
-                      child: Container(
-                        width: double.infinity,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: CupertinoColors.transparent,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: _gold),
-                        ),
-                        child: const Center(
-                          child: Text(
-                            '✦  Animate This Concept',
-                            style: TextStyle(
-                              color: _gold,
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    const Center(
-                      child: Text(
-                        'Pro plan unlocks 3 variations per prompt',
-                        style: TextStyle(
-                          color: _snippetGrey,
-                          fontSize: 11,
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
                     ),
                   ],
                   const SizedBox(height: 40),
