@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
+import 'package:ink_n_motion/services/firestore_wallet_service.dart';
 
 /// AI Concept Generator — single-prompt 2D tattoo concept renders.
 class AiCoachScreen extends StatefulWidget {
@@ -46,6 +48,29 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
       return;
     }
 
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) {
+      _showNotice('Please wait while we set up your account.', title: 'Not Ready');
+      return;
+    }
+
+    final wallet = await FirestoreWalletService.instance.getWallet(uid);
+    if (wallet == null) {
+      _showNotice('Unable to load your token balance. Please try again.', title: 'Wallet Error');
+      return;
+    }
+
+    bool isFreeRender = false;
+    if (wallet.hasFreeDailyConcept) {
+      isFreeRender = true;
+    } else if (wallet.totalBalance < InkTokenCost.aiConcept) {
+      _showNotice(
+        'You need 1 token for a concept render. Visit the store to top up.',
+        title: 'Not Enough Tokens',
+      );
+      return;
+    }
+
     setState(() {
       _isGenerating = true;
       _errorMessage = null;
@@ -83,6 +108,14 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
         setState(() {
           _generatedImageUrl = data['imageUrl'] as String?;
         });
+        if (isFreeRender) {
+          await FirestoreWalletService.instance.claimFreeDailyConcept(uid);
+        } else {
+          await FirestoreWalletService.instance.deductTokens(
+            uid,
+            InkTokenCost.aiConcept,
+          );
+        }
       } else {
         setState(() {
           _errorMessage = 'Server error. Please try again.';
@@ -108,10 +141,11 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
     }
   }
 
-  void _showNotice(String message) {
+  void _showNotice(String message, {String? title}) {
     showCupertinoDialog<void>(
       context: context,
       builder: (ctx) => CupertinoAlertDialog(
+        title: title != null ? Text(title) : null,
         content: Text(message),
         actions: [
           CupertinoDialogAction(

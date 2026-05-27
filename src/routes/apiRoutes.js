@@ -35,6 +35,13 @@ const STYLE_PROMPTS = {
     'Animate only the tattoo art on the skin. Cinematic flowing ink movement, dynamic artistic energy transforming the design. The body and background remain completely still. 10 seconds, seamless loop.',
 };
 
+function mapStyleToStyleId(style) {
+  const styleId = (style || '').trim().toLowerCase();
+  return Object.prototype.hasOwnProperty.call(STYLE_PROMPTS, styleId) && styleId !== 'default'
+    ? styleId
+    : 'default';
+}
+
 function getStylePrompt(styleId) {
   return STYLE_PROMPTS[styleId] || STYLE_PROMPTS.default;
 }
@@ -52,7 +59,7 @@ router.post('/generate-video', upload.single('image'), async (req, res) => {
     }
 
     const style = req.body.style || '';
-    const styleId = (style || 'default').trim().toLowerCase();
+    const styleId = mapStyleToStyleId(style);
     const durationSeconds = parseDurationSeconds(req.body.duration);
     const imageBase64 = req.file.buffer.toString('base64');
 

@@ -2,8 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
+import 'package:ink_n_motion/services/firestore_wallet_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:ink_n_motion/screens/coverup_studio_picker.dart'
     if (dart.library.html) 'package:ink_n_motion/screens/coverup_studio_picker_web.dart'
@@ -144,6 +146,33 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
       return;
     }
 
+    // 1. Get current user
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) {
+      _showNotice('Please wait while we set up your account.', title: 'Not Ready');
+      return;
+    }
+
+    // 2. Get wallet
+    final wallet = await FirestoreWalletService.instance.getWallet(uid);
+    if (wallet == null) {
+      _showNotice('Unable to load your token balance. Please try again.', title: 'Wallet Error');
+      return;
+    }
+
+    // 3. Check free lifetime claim first
+    bool isFreeRender = false;
+    if (!wallet.freeVideoUsed) {
+      isFreeRender = true;
+    } else if (wallet.totalBalance < InkTokenCost.animateMyInk) {
+      // Not enough tokens — push to paywall
+      _showNotice(
+        'You need 10 tokens to animate. Visit the store to top up.',
+        title: 'Not Enough Tokens',
+      );
+      return;
+    }
+
     setState(() {
       _isGenerating = true;
       _errorMessage = null;
@@ -222,6 +251,15 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
             _videoUrl = videoUrl;
             _pollStatus = 'Complete!';
           });
+          // Deduct tokens or claim free render
+          if (isFreeRender) {
+            await FirestoreWalletService.instance.claimFreeVideo(uid);
+          } else {
+            await FirestoreWalletService.instance.deductTokens(
+              uid,
+              InkTokenCost.animateMyInk,
+            );
+          }
           break;
         }
 
