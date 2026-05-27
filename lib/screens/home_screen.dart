@@ -1,9 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show BorderRadius, Colors, ScaffoldMessenger, SnackBar, TextDecoration;
+import 'package:flutter/material.dart' show BorderRadius, Colors, TextDecoration;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:ink_n_motion/screens/animate_my_ink_screen.dart';
+import 'package:ink_n_motion/screens/coverup_studio_screen.dart';
 import 'package:ink_n_motion/screens/discover/artist_spotlight_screen.dart';
 import 'package:ink_n_motion/screens/discover/ink_chronicles_screen.dart';
 import 'package:ink_n_motion/screens/discover/ai_coach_screen.dart';
@@ -36,6 +38,8 @@ class HomeScreen extends ConsumerStatefulWidget {
         InkRoutes.artistSpotlight: (_) => const ArtistSpotlightScreen(),
         InkRoutes.styleArchive: (_) => const StyleArchiveScreen(),
         InkRoutes.aiCoach: (_) => const AiCoachScreen(),
+        InkRoutes.coverupStudio: (_) => const CoverupStudioScreen(),
+        InkRoutes.animateMyInk: (_) => const AnimateMyInkScreen(),
       };
 
   @override
@@ -67,12 +71,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void _openMotionStudio() {
     ref.read(shellTabIndexProvider.notifier).state =
         InkShellLayout.studioTabIndex;
-  }
-
-  void _showComingSoon(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Coming soon — stay tuned!')),
-    );
   }
 
   @override
@@ -160,7 +158,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               title: '2D Concept Generator',
               snippet:
                   'Describe your tattoo and get an AI-designed concept in seconds.',
-              onTap: () => _showComingSoon(context),
+              onTap: () =>
+                  InkNavigation.pushNamed(context, InkRoutes.aiCoach),
             ),
             _CreateSectionCard(
               imageAsset: 'assets/images/create_coverup.png',
@@ -168,7 +167,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               title: 'Coverup Studio',
               snippet:
                   'Upload your existing tattoo and preview a coverup design over it.',
-              onTap: () => _showComingSoon(context),
+              onTap: () =>
+                  InkNavigation.pushNamed(context, InkRoutes.coverupStudio),
             ),
             _CreateSectionCard(
               imageAsset: 'assets/images/create_video.png',
@@ -176,7 +176,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               title: 'Animate My Ink',
               snippet:
                   'Turn any tattoo photo into a stunning 10-second animated video.',
-              onTap: () => _showComingSoon(context),
+              onTap: () =>
+                  InkNavigation.pushNamed(context, InkRoutes.animateMyInk),
             ),
             Padding(
               padding: EdgeInsets.fromLTRB(

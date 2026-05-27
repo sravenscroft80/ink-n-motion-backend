@@ -7,6 +7,8 @@ abstract final class InkRoutes {
   static const String artistSpotlight = '/discover/artist-spotlight';
   static const String styleArchive = '/discover/style-archive';
   static const String aiCoach = '/discover/ai-coach';
+  static const String coverupStudio = '/discover/coverup-studio';
+  static const String animateMyInk = '/discover/animate-my-ink';
 
   static const String styleDetailPrefix = '/discover/style-archive/detail/';
 

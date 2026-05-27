@@ -1,33 +1,38 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
+import 'package:ink_n_motion/screens/coverup_studio_picker.dart'
+    if (dart.library.html) 'package:ink_n_motion/screens/coverup_studio_picker_web.dart'
+    if (dart.library.io) 'package:ink_n_motion/screens/coverup_studio_picker_io.dart';
 
-/// AI Concept Generator — single-prompt 2D tattoo concept renders.
-class AiCoachScreen extends StatefulWidget {
-  const AiCoachScreen({super.key});
-
-  static const String heroImageAsset = 'assets/images/ai_coach.png';
+/// Coverup Studio — upload existing tattoo photo and preview AI coverup concepts.
+class CoverupStudioScreen extends StatefulWidget {
+  const CoverupStudioScreen({super.key});
 
   @override
-  State<AiCoachScreen> createState() => _AiCoachScreenState();
+  State<CoverupStudioScreen> createState() => _CoverupStudioScreenState();
 }
 
-class _AiCoachScreenState extends State<AiCoachScreen> {
+class _CoverupStudioScreenState extends State<CoverupStudioScreen> {
   static const Color _background = Color(0xFF0D0D0D);
   static const Color _gold = Color(0xFFD4AF37);
   static const Color _goldDisabled = Color(0xFF8B7D2A);
   static const Color _surface = Color(0xFF1A1A1A);
   static const Color _border = Color(0xFF333333);
   static const Color _hintGrey = Color(0xFF666666);
+  static const Color _mutedGrey = Color(0xFF444444);
   static const Color _snippetGrey = Color(0xFF999999);
   static const Color _errorRed = Color(0xFFCC3333);
 
   final TextEditingController _promptController = TextEditingController();
 
   bool _isGenerating = false;
-  String? _generatedImageUrl;
+  Uint8List? _selectedImageBytes;
+  String? _selectedImageName;
+  String? _resultImageUrl;
   String? _errorMessage;
 
   @override
@@ -36,11 +41,27 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
     super.dispose();
   }
 
-  Future<void> _generateConcept() async {
+  Future<void> _pickImage() async {
+    final picked = await pickCoverupImage();
+    if (!mounted || picked == null) return;
+
+    setState(() {
+      _selectedImageBytes = picked.bytes;
+      _selectedImageName = picked.name;
+      _errorMessage = null;
+    });
+  }
+
+  Future<void> _generateCoverup() async {
+    if (_selectedImageBytes == null) {
+      _showNotice('Please upload a photo of your tattoo first');
+      return;
+    }
+
     final prompt = _promptController.text.trim();
     if (prompt.isEmpty) {
       setState(() {
-        _errorMessage = 'Please describe your tattoo vision first.';
+        _errorMessage = 'Please describe your coverup design';
       });
       return;
     }
@@ -48,29 +69,36 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
     setState(() {
       _isGenerating = true;
       _errorMessage = null;
-      _generatedImageUrl = null;
+      _resultImageUrl = null;
     });
 
     try {
-      final response = await http
-          .post(
-            Uri.parse(
-              'https://ink-n-motion-backend.onrender.com/api/generate-concept',
-            ),
-            headers: const {'Content-Type': 'application/json'},
-            body: jsonEncode({
-              'prompt': prompt,
-              'style': '2d_tattoo_concept',
-            }),
-          )
-          .timeout(const Duration(seconds: 60));
+      final request = http.MultipartRequest(
+        'POST',
+        Uri.parse(
+          'https://ink-n-motion-backend.onrender.com/api/generate-coverup',
+        ),
+      )
+        ..fields['prompt'] = prompt
+        ..fields['style'] = 'coverup_tattoo'
+        ..files.add(
+          http.MultipartFile.fromBytes(
+            'image',
+            _selectedImageBytes!,
+            filename: _selectedImageName ?? 'tattoo.jpg',
+          ),
+        );
+
+      final streamedResponse =
+          await request.send().timeout(const Duration(seconds: 90));
+      final response = await http.Response.fromStream(streamedResponse);
 
       if (!mounted) return;
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
         setState(() {
-          _generatedImageUrl = data['imageUrl'] as String?;
+          _resultImageUrl = data['imageUrl'] as String?;
         });
       } else {
         setState(() {
@@ -80,7 +108,8 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
     } on TimeoutException {
       if (!mounted) return;
       setState(() {
-        _errorMessage = 'Timed out. Please try again.';
+        _errorMessage =
+            'Timed out — coverup renders can take up to 90 seconds';
       });
     } catch (_) {
       if (!mounted) return;
@@ -141,7 +170,7 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
                   ),
                   const Expanded(
                     child: Text(
-                      'AI Concept Generator',
+                      'Coverup Studio',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: CupertinoColors.white,
@@ -163,7 +192,7 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
                 children: [
                   const SizedBox(height: 20),
                   const Text(
-                    'Describe Your Tattoo Vision',
+                    'Transform Your Existing Ink',
                     style: TextStyle(
                       color: _gold,
                       fontSize: 22,
@@ -172,35 +201,88 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
                   ),
                   const SizedBox(height: 8),
                   const Text(
-                    'Include placement, size, color, and style if known',
+                    'Upload a photo of your tattoo, then describe your coverup vision',
                     style: TextStyle(
                       color: _snippetGrey,
                       fontSize: 14,
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(CupertinoIcons.sparkles, color: _gold, size: 14),
-                      SizedBox(width: 6),
-                      Text(
-                        '1 free render per day  ·  No account needed',
-                        style: TextStyle(
-                          color: _gold,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
+                  const SizedBox(height: 24),
+                  const Text(
+                    'Step 1 — Your Tattoo Photo',
+                    style: TextStyle(
+                      color: CupertinoColors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 10),
+                  GestureDetector(
+                    onTap: _pickImage,
+                    child: Container(
+                      width: double.infinity,
+                      height: 200,
+                      decoration: BoxDecoration(
+                        color: _surface,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: _border),
+                      ),
+                      clipBehavior: Clip.antiAlias,
+                      child: _selectedImageBytes != null
+                          ? ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.memory(
+                                _selectedImageBytes!,
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                                height: 200,
+                              ),
+                            )
+                          : const Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  CupertinoIcons.photo,
+                                  color: _hintGrey,
+                                  size: 40,
+                                ),
+                                SizedBox(height: 12),
+                                Text(
+                                  'Tap to upload tattoo photo',
+                                  style: TextStyle(
+                                    color: _hintGrey,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                SizedBox(height: 4),
+                                Text(
+                                  'JPG or PNG',
+                                  style: TextStyle(
+                                    color: _mutedGrey,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    'Step 2 — Describe Your Coverup',
+                    style: TextStyle(
+                      color: CupertinoColors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
                   CupertinoTextField(
                     controller: _promptController,
-                    maxLines: 5,
+                    maxLines: 4,
                     minLines: 3,
                     style: const TextStyle(color: CupertinoColors.white),
                     placeholder:
-                        'e.g. A serpent coiled around a compass rose, forearm, black and grey, fine line...',
+                        'e.g. Cover with a large Japanese koi fish, bold color, flowing water elements...',
                     placeholderStyle: const TextStyle(color: _hintGrey),
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
@@ -210,8 +292,23 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
+                  const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(CupertinoIcons.sparkles, color: _gold, size: 14),
+                      SizedBox(width: 6),
+                      Text(
+                        '3 tokens per render  ·  First render free',
+                        style: TextStyle(
+                          color: _gold,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
                   GestureDetector(
-                    onTap: _isGenerating ? null : _generateConcept,
+                    onTap: _isGenerating ? null : _generateCoverup,
                     child: Container(
                       width: double.infinity,
                       height: 52,
@@ -239,7 +336,7 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
                                 ],
                               )
                             : const Text(
-                                '✦  Generate Concept',
+                                '✦  Generate Coverup Preview',
                                 style: TextStyle(
                                   color: CupertinoColors.black,
                                   fontWeight: FontWeight.bold,
@@ -267,14 +364,23 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
                       ),
                     ),
                   ],
-                  if (_generatedImageUrl != null) ...[
+                  if (_resultImageUrl != null) ...[
                     const SizedBox(height: 28),
                     const Text(
-                      'Your Concept',
+                      'Your Coverup Preview',
                       style: TextStyle(
                         color: CupertinoColors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'This is an AI concept — share with your artist for the final design',
+                      style: TextStyle(
+                        color: _snippetGrey,
+                        fontSize: 12,
+                        fontStyle: FontStyle.italic,
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -289,7 +395,7 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(12),
                         child: Image.network(
-                          _generatedImageUrl!,
+                          _resultImageUrl!,
                           fit: BoxFit.contain,
                           loadingBuilder: (context, child, loadingProgress) {
                             if (loadingProgress == null) return child;
@@ -315,33 +421,33 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        _ResultActionButton(
-                          icon: CupertinoIcons.arrow_down_circle,
+                        _ActionButton(
                           label: 'Save',
+                          icon: CupertinoIcons.arrow_down_circle,
                           backgroundColor: _surface,
                           foregroundColor: CupertinoColors.white,
                           onTap: _saveImage,
                         ),
-                        _ResultActionButton(
-                          icon: CupertinoIcons.share,
+                        _ActionButton(
                           label: 'Share',
+                          icon: CupertinoIcons.share,
                           backgroundColor: _surface,
                           foregroundColor: CupertinoColors.white,
                           onTap: _shareImage,
                         ),
-                        _ResultActionButton(
+                        _ActionButton(
+                          label: 'Re-generate',
                           icon: CupertinoIcons.refresh,
-                          label: 'Variations',
                           backgroundColor: _gold,
                           foregroundColor: CupertinoColors.black,
-                          onTap: _isGenerating ? null : _generateConcept,
+                          onTap: _isGenerating ? null : _generateCoverup,
                         ),
                       ],
                     ),
                     const SizedBox(height: 12),
                     const Center(
                       child: Text(
-                        'Pro plan unlocks 3 variations per prompt',
+                        'Results are AI concepts — always consult a professional tattoo artist',
                         style: TextStyle(
                           color: _snippetGrey,
                           fontSize: 11,
@@ -361,17 +467,17 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
   }
 }
 
-class _ResultActionButton extends StatelessWidget {
-  const _ResultActionButton({
-    required this.icon,
+class _ActionButton extends StatelessWidget {
+  const _ActionButton({
     required this.label,
+    required this.icon,
     required this.backgroundColor,
     required this.foregroundColor,
     required this.onTap,
   });
 
-  final IconData icon;
   final String label;
+  final IconData icon;
   final Color backgroundColor;
   final Color foregroundColor;
   final VoidCallback? onTap;
