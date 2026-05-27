@@ -127,7 +127,7 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
       final request = http.MultipartRequest(
         'POST',
         Uri.parse(
-          'https://ink-n-motion-backend.onrender.com/api/generate-video',
+          'https://ink-n-motion-api.onrender.com/api/generate-video',
         ),
       )
         ..fields['style'] = _selectedStyle.id
@@ -170,7 +170,7 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
 
         final pollResponse = await http.get(
           Uri.parse(
-            'https://ink-n-motion-backend.onrender.com/api/generate-video-status/$_taskId',
+            'https://ink-n-motion-api.onrender.com/api/generate-video-status/$_taskId',
           ),
         );
 

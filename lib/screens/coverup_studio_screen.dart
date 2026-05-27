@@ -76,7 +76,7 @@ class _CoverupStudioScreenState extends State<CoverupStudioScreen> {
       final request = http.MultipartRequest(
         'POST',
         Uri.parse(
-          'https://ink-n-motion-backend.onrender.com/api/generate-coverup',
+          'https://ink-n-motion-api.onrender.com/api/generate-coverup',
         ),
       )
         ..fields['prompt'] = prompt

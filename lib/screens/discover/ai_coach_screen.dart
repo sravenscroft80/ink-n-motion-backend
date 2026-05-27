@@ -66,7 +66,7 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
       final response = await http
           .post(
             Uri.parse(
-              'https://ink-n-motion-backend.onrender.com/api/generate-concept',
+              'https://ink-n-motion-api.onrender.com/api/generate-concept',
             ),
             headers: const {'Content-Type': 'application/json'},
             body: jsonEncode({
