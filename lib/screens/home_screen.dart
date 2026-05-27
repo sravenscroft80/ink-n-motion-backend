@@ -11,16 +11,12 @@ import 'package:ink_n_motion/screens/discover/ink_chronicles_screen.dart';
 import 'package:ink_n_motion/screens/discover/ai_coach_screen.dart';
 import 'package:ink_n_motion/screens/discover/style_archive_screen.dart';
 import 'package:ink_n_motion/services/navigation.dart';
-import 'package:ink_n_motion/state/providers.dart';
 import 'package:ink_n_motion/utils/design_tokens.dart';
 import 'package:ink_n_motion/utils/shell_layout.dart';
-import 'package:ink_n_motion/widgets/discover/how_it_works_modal.dart';
 
 /// Discover tab — premium minimalist landing; Studio via shell tab only.
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
-
-  static const double _ctaCornerRadius = 18;
 
   static const String inkChroniclesHero = 'assets/images/ink_chronicles.png';
   static const String artistSpotlightHero = 'assets/images/artist_spotlight.png';
@@ -48,39 +44,13 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      unawaited(_maybeShowHowItWorks());
-    });
-  }
-
-  Future<void> _maybeShowHowItWorks() async {
-    if (!mounted) return;
-
-    final storage = ref.read(storageServiceProvider);
-    final viewCount = await storage.loadHomeTourViewCount();
-    if (viewCount >= 2 || !mounted) return;
-
-    await storage.incrementHomeTourViewCount();
-    if (!mounted) return;
-
-    await HowItWorksModal.show(context);
-  }
-
-  void _openMotionStudio() {
-    ref.read(shellTabIndexProvider.notifier).state =
-        InkShellLayout.studioTabIndex;
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final bottomInset = MediaQuery.paddingOf(context).bottom;
     final viewportHeight = MediaQuery.sizeOf(context).height;
 
     return CupertinoPageScaffold(
       backgroundColor: InkColors.backgroundPrimary,
       child: SingleChildScrollView(
+        padding: const EdgeInsets.only(bottom: 100),
         physics: const BouncingScrollPhysics(
           parent: AlwaysScrollableScrollPhysics(),
         ),
@@ -178,32 +148,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   'Turn any tattoo photo into a stunning 10-second animated video.',
               onTap: () =>
                   InkNavigation.pushNamed(context, InkRoutes.animateMyInk),
-            ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(
-                InkSpacing.md,
-                InkSpacing.md,
-                InkSpacing.md,
-                InkSpacing.xl + bottomInset,
-              ),
-              child: Column(
-                children: [
-                  _PulsingGoldCtaButton(
-                    label: 'START MOTION STUDIO',
-                    cornerRadius: HomeScreen._ctaCornerRadius,
-                    onPressed: _openMotionStudio,
-                  ),
-                  const SizedBox(height: InkSpacing.sm),
-                  Text(
-                    'Free to start  ·  No account needed',
-                    textAlign: TextAlign.center,
-                    style: InkTypography.caption2.copyWith(
-                      fontSize: 11,
-                      color: InkColors.textPrimary.withValues(alpha: 0.4),
-                    ),
-                  ),
-                ],
-              ),
             ),
           ],
         ),
@@ -564,116 +508,6 @@ class _CreateSectionCard extends StatelessWidget {
                 ),
               ],
             ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _PulsingGoldCtaButton extends StatefulWidget {
-  const _PulsingGoldCtaButton({
-    required this.label,
-    required this.cornerRadius,
-    required this.onPressed,
-  });
-
-  final String label;
-  final double cornerRadius;
-  final VoidCallback onPressed;
-
-  @override
-  State<_PulsingGoldCtaButton> createState() => _PulsingGoldCtaButtonState();
-}
-
-class _PulsingGoldCtaButtonState extends State<_PulsingGoldCtaButton>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _pulseController;
-  late final Animation<double> _pulse;
-
-  @override
-  void initState() {
-    super.initState();
-    _pulseController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 2600),
-    )..repeat(reverse: true);
-    _pulse = CurvedAnimation(
-      parent: _pulseController,
-      curve: Curves.easeInOut,
-    );
-  }
-
-  @override
-  void dispose() {
-    _pulseController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final radius = BorderRadius.circular(widget.cornerRadius);
-
-    return AnimatedBuilder(
-      animation: _pulse,
-      builder: (context, child) {
-        final t = _pulse.value;
-        return Stack(
-          alignment: Alignment.center,
-          clipBehavior: Clip.none,
-          children: [
-            Transform.scale(
-              scale: 1.0 + t * 0.05,
-              child: Container(
-                width: double.infinity,
-                height: 50,
-                decoration: BoxDecoration(
-                  borderRadius: radius,
-                  boxShadow: [
-                    BoxShadow(
-                      color: InkColors.accentGold
-                          .withValues(alpha: 0.10 + t * 0.22),
-                      blurRadius: 14 + t * 22,
-                      spreadRadius: t * 6,
-                      offset: Offset(0, 6 + t * 4),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            child!,
-          ],
-        );
-      },
-      child: CupertinoButton(
-        padding: EdgeInsets.zero,
-        onPressed: widget.onPressed,
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: InkSpacing.md),
-          decoration: BoxDecoration(
-            borderRadius: radius,
-            gradient: InkColors.goldCtaGradient,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                CupertinoIcons.sparkles,
-                color: CupertinoColors.black.withValues(alpha: 0.85),
-                size: 17,
-              ),
-              const SizedBox(width: InkSpacing.sm),
-              Text(
-                widget.label,
-                style: InkTypography.headline.copyWith(
-                  color: CupertinoColors.black,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 0.5,
-                  fontSize: 16,
-                ),
-              ),
-            ],
           ),
         ),
       ),
