@@ -16,6 +16,22 @@ class AnimateMyInkScreen extends StatefulWidget {
   State<AnimateMyInkScreen> createState() => _AnimateMyInkScreenState();
 }
 
+class _InkStyle {
+  final String id;
+  final String label;
+  final String emoji;
+  final String hint;
+  final bool isFree;
+
+  const _InkStyle({
+    required this.id,
+    required this.label,
+    required this.emoji,
+    required this.hint,
+    required this.isFree,
+  });
+}
+
 class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
   static const Color _background = Color(0xFF0D0D0D);
   static const Color _gold = Color(0xFFD4AF37);
@@ -28,18 +44,54 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
   static const Color _errorRed = Color(0xFFCC3333);
   static const Color _pillDarkText = Color(0xFF0D0D0D);
 
-  static const List<String> _animationStyles = [
-    'Fluid',
-    'Sparkle',
-    'Neon Pulse',
-    'Cyberpunk',
-    'Watercolor',
-    'Dark Energy',
+  static const List<_InkStyle> _styles = [
+    _InkStyle(
+      id: 'ember_glow',
+      label: 'Ember Glow',
+      emoji: '🔥',
+      hint: 'Warm golden light pulses through the linework',
+      isFree: true,
+    ),
+    _InkStyle(
+      id: 'fluid_flow',
+      label: 'Fluid Flow',
+      emoji: '🌊',
+      hint: 'Ink ripples and breathes like liquid',
+      isFree: true,
+    ),
+    _InkStyle(
+      id: 'mystic_drift',
+      label: 'Mystic Drift',
+      emoji: '✨',
+      hint: 'Elements drift with an ethereal smoke energy',
+      isFree: true,
+    ),
+    _InkStyle(
+      id: 'electric_storm',
+      label: 'Electric Storm',
+      emoji: '⚡',
+      hint: 'Neon electricity arcs between the linework',
+      isFree: false,
+    ),
+    _InkStyle(
+      id: 'watercolor_bloom',
+      label: 'Watercolor Bloom',
+      emoji: '🎨',
+      hint: 'Ink bleeds outward like pigment on wet paper',
+      isFree: false,
+    ),
+    _InkStyle(
+      id: 'shadow_reaper',
+      label: 'Shadow Reaper',
+      emoji: '🌑',
+      hint: 'Dark gothic forms emerge from deep shadows',
+      isFree: false,
+    ),
   ];
 
   Uint8List? _selectedImageBytes;
   String? _selectedImageName;
-  String _selectedStyle = 'Fluid';
+  _InkStyle _selectedStyle = _styles[0];
   bool _isGenerating = false;
   String? _taskId;
   String? _pollStatus;
@@ -78,7 +130,7 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
           'https://ink-n-motion-backend.onrender.com/api/generate-video',
         ),
       )
-        ..fields['style'] = _selectedStyle.toLowerCase()
+        ..fields['style'] = _selectedStyle.id
         ..fields['duration'] = '10'
         ..files.add(
           http.MultipartFile.fromBytes(
@@ -326,6 +378,26 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
                             ),
                     ),
                   ),
+                  const SizedBox(height: 8),
+                  const Row(
+                    children: [
+                      Icon(
+                        CupertinoIcons.info_circle,
+                        color: Color(0xFF666666),
+                        size: 13,
+                      ),
+                      SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          'Tip: Frame your shot so the tattoo fills most of the photo for best results.',
+                          style: TextStyle(
+                            color: Color(0xFF666666),
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 24),
                   const Text(
                     'Step 2 — Choose Animation Style',
@@ -340,40 +412,84 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: [
-                        for (final style in _animationStyles)
+                        for (final style in _styles)
                           Padding(
                             padding: const EdgeInsets.only(right: 10),
                             child: GestureDetector(
                               onTap: () {
+                                if (!style.isFree) {
+                                  _showNotice(
+                                    'This style costs 2 additional tokens on top of your base render.\n\nToken wallet coming soon — style will unlock automatically.',
+                                    title:
+                                        '${style.emoji} ${style.label} — Premium Style',
+                                  );
+                                  return;
+                                }
                                 setState(() => _selectedStyle = style);
                               },
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 10,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: _selectedStyle == style
-                                      ? _gold
-                                      : _surface,
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Text(
-                                  style,
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: _selectedStyle == style
-                                        ? FontWeight.bold
-                                        : FontWeight.normal,
-                                    color: _selectedStyle == style
-                                        ? _pillDarkText
-                                        : _snippetGrey,
+                              child: Opacity(
+                                opacity: style.isFree ? 1.0 : 0.65,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 14,
+                                    vertical: 10,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: _selectedStyle.id == style.id
+                                        ? _gold
+                                        : _surface,
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(
+                                      color: !style.isFree
+                                          ? const Color(0xFF4FC3F7)
+                                          : const Color(0x00000000),
+                                      width: 1.5,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        style.emoji,
+                                        style: const TextStyle(fontSize: 14),
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        style.label,
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight:
+                                              _selectedStyle.id == style.id
+                                                  ? FontWeight.bold
+                                                  : FontWeight.normal,
+                                          color: _selectedStyle.id == style.id
+                                              ? _pillDarkText
+                                              : _snippetGrey,
+                                        ),
+                                      ),
+                                      if (!style.isFree) ...[
+                                        const SizedBox(width: 6),
+                                        const Text(
+                                          '🔒',
+                                          style: TextStyle(fontSize: 11),
+                                        ),
+                                      ],
+                                    ],
                                   ),
                                 ),
                               ),
                             ),
                           ),
                       ],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    _selectedStyle.hint,
+                    style: const TextStyle(
+                      color: Color(0xFF888888),
+                      fontSize: 12,
+                      fontStyle: FontStyle.italic,
                     ),
                   ),
                   const SizedBox(height: 24),
