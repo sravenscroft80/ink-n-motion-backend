@@ -23,25 +23,25 @@ class _OnboardingCarouselScreenState extends ConsumerState<OnboardingCarouselScr
 
   static const _pages = [
     _CarouselCardData(
-      icon: CupertinoIcons.camera_viewfinder,
-      title: 'Snap Your Ink',
+      icon: CupertinoIcons.book,
+      title: 'Explore the World of Ink',
       subtitle:
-          'Capture any tattoo instantly from your camera roll with auto-adjusting perspective processing.',
-      accent: InkColors.accentNeonCyan,
+          'Discover tattoo styles, featured artists, and curated reads — all in one place built for the ink-obsessed.',
+      accent: Color(0xFFD4AF37),
     ),
     _CarouselCardData(
       icon: CupertinoIcons.wand_stars,
-      title: 'Select Your Aesthetic',
+      title: 'Design Your Vision',
       subtitle:
-          'Choose from curated premium styles including Cyberpunk Neon, Traditional Japanese, and 3D Pop Pop.',
-      accent: InkColors.accentNeonMagenta,
+          'Describe your dream tattoo and get an AI-generated concept in seconds. Free every day — no account needed.',
+      accent: Color(0xFF4FC3F7),
     ),
     _CarouselCardData(
       icon: CupertinoIcons.play_circle,
-      title: 'Animate into Motion',
+      title: 'Bring Your Ink to Life',
       subtitle:
-          'Deduct credits or go Unlimited to watch your design transform into high-definition looping cinematic streams.',
-      accent: InkColors.accentSuccess,
+          'Animate your tattoo into a stunning 10-second video. Coverups, concepts, and animations — all in one app.',
+      accent: Color(0xFFD4AF37),
     ),
   ];
 
