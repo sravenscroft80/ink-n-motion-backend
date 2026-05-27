@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show Colors, TextDecoration;
+import 'package:flutter/material.dart' show BorderRadius, Colors, ScaffoldMessenger, SnackBar, TextDecoration;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ink_n_motion/screens/discover/artist_spotlight_screen.dart';
@@ -12,8 +12,6 @@ import 'package:ink_n_motion/services/navigation.dart';
 import 'package:ink_n_motion/state/providers.dart';
 import 'package:ink_n_motion/utils/design_tokens.dart';
 import 'package:ink_n_motion/utils/shell_layout.dart';
-import 'package:ink_n_motion/widgets/discover/discover_landing_content.dart';
-import 'package:ink_n_motion/widgets/discover/discover_pillar_grid.dart';
 import 'package:ink_n_motion/widgets/discover/how_it_works_modal.dart';
 
 /// Discover tab — premium minimalist landing; Studio via shell tab only.
@@ -24,6 +22,13 @@ class HomeScreen extends ConsumerStatefulWidget {
 
   static const String inkChroniclesHero = 'assets/images/ink_chronicles.png';
   static const String artistSpotlightHero = 'assets/images/artist_spotlight.png';
+  static const String styleArchiveHero = 'assets/images/style_archive.png';
+  static const String discoverHeroFallback = 'assets/images/discover_hero.png';
+
+  static const Color _sectionGold = Color(0xFFD4AF37);
+  static const Color _cardBackground = Color(0xFF1A1A1A);
+  static const Color _snippetGrey = Color(0xFF999999);
+  static const Color _pillDarkText = Color(0xFF0D0D0D);
 
   /// Canonical registry for Discover pillar navigation.
   static Map<String, WidgetBuilder> get discoverPillarScreens => {
@@ -64,6 +69,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         InkShellLayout.studioTabIndex;
   }
 
+  void _showComingSoon(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Coming soon — stay tuned!')),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.paddingOf(context).bottom;
@@ -80,21 +91,92 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           children: [
             const _DiscoverWelcomeTypewriter(),
             _DiscoverImmersiveHero(viewportHeight: viewportHeight),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                InkSpacing.md,
-                0,
-                InkSpacing.md,
-                InkSpacing.sm,
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: InkSpacing.md),
+              child: Text(
+                '| EXPLORE',
+                style: TextStyle(
+                  color: HomeScreen._sectionGold,
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              child: const Column(
+            ),
+            const SizedBox(height: 12),
+            _ExploreSectionCard(
+              imageAsset: HomeScreen.inkChroniclesHero,
+              pill: 'LIBRARY',
+              title: 'Resource Library',
+              snippet: 'Essential reads for the ink-obsessed.',
+              onTap: () =>
+                  InkNavigation.pushNamed(context, InkRoutes.inkChronicles),
+            ),
+            _ExploreSectionCard(
+              imageAsset: HomeScreen.artistSpotlightHero,
+              pill: 'SPOTLIGHT',
+              title: 'Artist Spotlight',
+              snippet: 'A new creator featured every day.',
+              onTap: () =>
+                  InkNavigation.pushNamed(context, InkRoutes.artistSpotlight),
+            ),
+            _ExploreSectionCard(
+              imageAsset: HomeScreen.styleArchiveHero,
+              fallbackImageAsset: HomeScreen.discoverHeroFallback,
+              pill: 'ARCHIVE',
+              title: 'Tattoo Style Archive',
+              snippet: 'From ancient roots to modern movements.',
+              onTap: () =>
+                  InkNavigation.pushNamed(context, InkRoutes.styleArchive),
+            ),
+            const SizedBox(height: 28),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: InkSpacing.md),
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  DiscoverPillarSectionLabel(),
-                  SizedBox(height: InkSpacing.md),
-                  DiscoverPillarGrid(),
+                children: const [
+                  Text(
+                    '| CREATE',
+                    style: TextStyle(
+                      color: HomeScreen._sectionGold,
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    'Your tattoo. Your vision. Brought to life.',
+                    style: TextStyle(
+                      color: HomeScreen._snippetGrey,
+                      fontSize: 13,
+                    ),
+                  ),
                 ],
               ),
+            ),
+            const SizedBox(height: 12),
+            _CreateSectionCard(
+              imageAsset: 'assets/images/create_concept.png',
+              pill: 'FREE DAILY',
+              title: '2D Concept Generator',
+              snippet:
+                  'Describe your tattoo and get an AI-designed concept in seconds.',
+              onTap: () => _showComingSoon(context),
+            ),
+            _CreateSectionCard(
+              imageAsset: 'assets/images/create_coverup.png',
+              pill: '3 TOKENS',
+              title: 'Coverup Studio',
+              snippet:
+                  'Upload your existing tattoo and preview a coverup design over it.',
+              onTap: () => _showComingSoon(context),
+            ),
+            _CreateSectionCard(
+              imageAsset: 'assets/images/create_video.png',
+              pill: '10 TOKENS',
+              title: 'Animate My Ink',
+              snippet:
+                  'Turn any tattoo photo into a stunning 10-second animated video.',
+              onTap: () => _showComingSoon(context),
             ),
             Padding(
               padding: EdgeInsets.fromLTRB(
@@ -275,6 +357,212 @@ class _DiscoverImmersiveHero extends StatelessWidget {
                 ),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _GoldPill extends StatelessWidget {
+  const _GoldPill({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: HomeScreen._sectionGold,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+        child: Text(
+          label,
+          style: const TextStyle(
+            color: HomeScreen._pillDarkText,
+            fontSize: 10,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ExploreSectionCard extends StatelessWidget {
+  const _ExploreSectionCard({
+    required this.imageAsset,
+    required this.pill,
+    required this.title,
+    required this.snippet,
+    required this.onTap,
+    this.fallbackImageAsset,
+  });
+
+  final String imageAsset;
+  final String? fallbackImageAsset;
+  final String pill;
+  final String title;
+  final String snippet;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          height: 110,
+          decoration: BoxDecoration(
+            color: HomeScreen._cardBackground,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Row(
+            children: [
+              ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(12),
+                  bottomLeft: Radius.circular(12),
+                ),
+                child: Image.asset(
+                  imageAsset,
+                  width: 110,
+                  height: 110,
+                  fit: BoxFit.cover,
+                  errorBuilder: fallbackImageAsset == null
+                      ? null
+                      : (context, error, stackTrace) => Image.asset(
+                            fallbackImageAsset!,
+                            width: 110,
+                            height: 110,
+                            fit: BoxFit.cover,
+                          ),
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _GoldPill(label: pill),
+                      const SizedBox(height: 6),
+                      Text(
+                        title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        snippet,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: HomeScreen._snippetGrey,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CreateSectionCard extends StatelessWidget {
+  const _CreateSectionCard({
+    required this.imageAsset,
+    required this.pill,
+    required this.title,
+    required this.snippet,
+    required this.onTap,
+  });
+
+  final String imageAsset;
+  final String pill;
+  final String title;
+  final String snippet;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      child: GestureDetector(
+        onTap: onTap,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: SizedBox(
+            height: 130,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Image.asset(
+                  imageAsset,
+                  fit: BoxFit.cover,
+                ),
+                const DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      colors: [
+                        Color(0xCC000000),
+                        Colors.transparent,
+                      ],
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(14),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _GoldPill(label: pill),
+                      const SizedBox(height: 8),
+                      Text(
+                        title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      SizedBox(
+                        width: 220,
+                        child: Text(
+                          snippet,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

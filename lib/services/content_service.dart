@@ -114,7 +114,9 @@ class ContentService {
     final chronicles = await fetchLiveChronicles(forceRefresh: forceRefresh);
 
     if (chronicles.isEmpty) {
-      throw StateError('Ink Chronicles content is empty');
+      debugPrint(
+        'ContentService: no chronicles available, continuing with empty list',
+      );
     }
 
     final content = DiscoverContent(

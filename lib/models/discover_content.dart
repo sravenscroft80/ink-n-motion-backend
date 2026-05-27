@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 class ChronicleEntry {
   const ChronicleEntry({
     required this.title,
@@ -35,17 +37,24 @@ class ArtistSpotlightEntry {
   });
 
   factory ArtistSpotlightEntry.fromJson(Map<String, dynamic> json) {
+    final heroImage =
+        json['hero_image'] ?? json['imageUrl'] ?? json['profileUrl'] ?? '';
+
     return ArtistSpotlightEntry(
       name: json['name'] as String,
       location: json['location'] as String? ?? '',
-      nationality: json['nationality'] as String,
-      specialization: json['specialization'] as String? ??
-          json['specialty'] as String? ??
+      nationality: json['nationality'] ?? json['origin'] ?? '',
+      specialization: json['specialization'] ??
+          json['specialty'] ??
+          json['style'] ??
           '',
       experienceYears: (json['experience_years'] as num?)?.toInt() ?? 0,
-      workLink: json['work_link'] as String,
-      profilePhotoUrl: json['profile_photo_url'] as String? ?? '',
-      heroImage: json['hero_image'] as String,
+      workLink: json['work_link'] ?? json['linkUrl'] ?? json['portfolioUrl'] ?? '',
+      profilePhotoUrl: json['profile_photo_url'] ??
+          json['imageUrl'] ??
+          json['profileUrl'] ??
+          '',
+      heroImage: heroImage,
       bio: json['bio'] as String? ?? '',
     );
   }
@@ -183,20 +192,44 @@ class DiscoverContent {
   });
 
   factory DiscoverContent.fromJson(Map<String, dynamic> json) {
-    return DiscoverContent(
-      inkChronicles: (json['inkChronicles'] as List<dynamic>)
+    List<ChronicleEntry> chronicles = [];
+    List<ArtistSpotlightEntry> spotlight = [];
+    List<StyleArchiveEntry> styles = [];
+
+    try {
+      final raw = json['inkChronicles'] ?? json['resources'] ?? [];
+      chronicles = (raw as List<dynamic>)
           .map((item) => ChronicleEntry.fromJson(item as Map<String, dynamic>))
-          .toList(),
-      artistSpotlight: (json['artistSpotlight'] as List<dynamic>)
+          .toList();
+    } catch (e) {
+      debugPrint('DiscoverContent: inkChronicles parse failed: $e');
+    }
+
+    try {
+      final raw = json['artistSpotlight'] ?? [];
+      spotlight = (raw as List<dynamic>)
           .map(
-            (item) => ArtistSpotlightEntry.fromJson(item as Map<String, dynamic>),
+            (item) =>
+                ArtistSpotlightEntry.fromJson(item as Map<String, dynamic>),
           )
-          .toList(),
-      styleArchive: (json['styleArchive'] as List<dynamic>)
-          .map(
-            (item) => StyleArchiveEntry.fromJson(item as Map<String, dynamic>),
-          )
-          .toList(),
+          .toList();
+    } catch (e) {
+      debugPrint('DiscoverContent: artistSpotlight parse failed: $e');
+    }
+
+    try {
+      final raw = json['styleArchive'] ?? [];
+      styles = (raw as List<dynamic>)
+          .map((item) => StyleArchiveEntry.fromJson(item as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      debugPrint('DiscoverContent: styleArchive parse failed: $e');
+    }
+
+    return DiscoverContent(
+      inkChronicles: chronicles,
+      artistSpotlight: spotlight,
+      styleArchive: styles,
     );
   }
 
