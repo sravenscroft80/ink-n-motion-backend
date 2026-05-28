@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ink_n_motion/screens/home_shell_screen.dart';
+import 'package:ink_n_motion/screens/login_screen.dart';
 import 'package:ink_n_motion/screens/onboarding_carousel_screen.dart';
 import 'package:ink_n_motion/state/providers.dart';
 import 'package:ink_n_motion/utils/design_tokens.dart';
@@ -36,10 +37,19 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
     if (!mounted) return;
 
-    final hasCompletedOnboarding = ref.read(appStateProvider).hasCompletedOnboarding;
-    final nextScreen = hasCompletedOnboarding
-        ? const HomeShellScreen()
-        : const OnboardingCarouselScreen();
+    final authService = ref.read(firebaseAuthServiceProvider);
+    final user = authService.currentUser;
+
+    final Widget nextScreen;
+    if (user == null || authService.isAnonymous) {
+      nextScreen = const LoginScreen();
+    } else {
+      final hasCompletedOnboarding =
+          ref.read(appStateProvider).hasCompletedOnboarding;
+      nextScreen = hasCompletedOnboarding
+          ? const HomeShellScreen()
+          : const OnboardingCarouselScreen();
+    }
 
     await Navigator.of(context).pushReplacement(
       CupertinoPageRoute<void>(builder: (_) => nextScreen),

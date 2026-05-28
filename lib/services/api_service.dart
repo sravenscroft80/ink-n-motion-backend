@@ -219,7 +219,9 @@ class ApiService {
 
   void _throwIfOffline(DioException error) {
     if (error.type != DioExceptionType.connectionError &&
-        error.type != DioExceptionType.sendTimeout) return;
+        error.type != DioExceptionType.sendTimeout) {
+      return;
+    }
     throw OfflineNetworkException();
   }
 

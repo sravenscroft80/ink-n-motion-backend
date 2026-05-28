@@ -89,7 +89,7 @@ class StyleArchiveScreen extends ConsumerWidget {
                       InkSpacing.xl,
                     ),
                     itemCount: styles.length,
-                    separatorBuilder: (_, __) =>
+                    separatorBuilder: (context, index) =>
                         const SizedBox(height: InkSpacing.sm),
                     itemBuilder: (context, index) {
                       final entry = styles[index];
@@ -191,7 +191,7 @@ class _StyleArchiveCard extends StatelessWidget {
                 width: 80,
                 height: 80,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Container(
+                errorBuilder: (context, error, stackTrace) => Container(
                   width: 80,
                   height: 80,
                   color: InkColors.backgroundElevated,

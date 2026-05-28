@@ -104,7 +104,7 @@ class _CreateCard extends StatelessWidget {
               height: 190,
               width: double.infinity,
               fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => Container(
+              errorBuilder: (context, error, stackTrace) => Container(
                 height: 190,
                 color: const Color(0xFF1A1A1A),
               ),
