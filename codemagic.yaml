@@ -1,0 +1,35 @@
+workflows:
+  ios-release:
+    name: iOS Release
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    integrations:
+      app_store_connect: Codemagic_AstroDots
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.inknmotion.app
+      vars:
+        BUNDLE_ID: com.inknmotion.app
+        XCODE_WORKSPACE: ios/Runner.xcworkspace
+        XCODE_SCHEME: Runner
+      flutter: stable
+      xcode: latest
+    scripts:
+      - name: Inject GoogleService-Info.plist
+        script: |
+          echo $IOS_FIREBASE_CONFIG | base64 --decode > $CM_BUILD_DIR/ios/Runner/GoogleService-Info.plist
+      - name: Get Flutter packages
+        script: flutter packages pub get
+      - name: Flutter analyze
+        script: flutter analyze
+      - name: Build iOS
+        script: |
+          flutter build ios --release --no-codesign
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
