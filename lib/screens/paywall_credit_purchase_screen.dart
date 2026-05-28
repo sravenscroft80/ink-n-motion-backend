@@ -2,13 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ink_n_motion/models/paywall_tier.dart';
 import 'package:ink_n_motion/services/billing_service.dart';
-import 'package:ink_n_motion/state/app_state.dart';
 import 'package:ink_n_motion/state/providers.dart';
 import 'package:ink_n_motion/utils/design_tokens.dart';
 import 'package:ink_n_motion/widgets/ink_frosted_glass.dart';
 import 'package:ink_n_motion/widgets/paywall/paywall_tier_card.dart';
 
-/// Premium Cupertino paywall for credit packs and Ink Plus subscriptions.
+/// Premium Cupertino paywall for credit packs and Ink monthly subscriptions.
 class PaywallCreditPurchaseScreen extends ConsumerStatefulWidget {
   const PaywallCreditPurchaseScreen({super.key});
 
@@ -28,16 +27,18 @@ class _PaywallCreditPurchaseScreenState
     final notifier = ref.read(appStateProvider.notifier);
     final bool success;
     switch (tier.id) {
-      case PaywallTierId.spark10:
-        success = await notifier.purchaseSparkPack();
-      case PaywallTierId.creator30:
+      case PaywallTierId.introPack:
+        success = await notifier.purchaseIntroPack();
+      case PaywallTierId.creatorPack:
         success = await notifier.purchaseCreatorPack();
-      case PaywallTierId.pro60:
-        success = await notifier.purchaseProPack();
-      case PaywallTierId.plusMonthly:
-        success = await notifier.purchasePlusMonthly();
-      case PaywallTierId.plusAnnual:
-        success = await notifier.purchasePlusAnnual();
+      case PaywallTierId.studioPack:
+        success = await notifier.purchaseStudioPack();
+      case PaywallTierId.sparkMonthly:
+        success = await notifier.purchaseSparkMonthly();
+      case PaywallTierId.flowMonthly:
+        success = await notifier.purchaseFlowMonthly();
+      case PaywallTierId.studioMonthly:
+        success = await notifier.purchaseStudioMonthly();
     }
 
     if (!mounted) return;
@@ -90,12 +91,12 @@ class _PaywallCreditPurchaseScreenState
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                '${appState.creditsBalance} credits',
+                                '${appState.creditsBalance} tokens',
                                 style: InkTypography.title3,
                               ),
                               Text(
                                 appState.isPremiumSubscriber
-                                    ? 'Ink Plus active · ${appState.premiumRendersRemaining} premium renders left'
+                                    ? 'Subscription active'
                                     : 'Select a pack to continue',
                                 style: InkTypography.footnote,
                               ),
@@ -107,6 +108,11 @@ class _PaywallCreditPurchaseScreenState
                   ),
                   const SizedBox(height: InkSpacing.lg),
                   Text('Credit packs', style: InkTypography.title2),
+                  const SizedBox(height: InkSpacing.sm),
+                  Text(
+                    'Tokens never expire. Subscription tokens refresh monthly.',
+                    style: InkTypography.footnote,
+                  ),
                   const SizedBox(height: InkSpacing.md),
                   ...PaywallTier.creditPacks.map((tier) {
                     return PaywallTierCard(
@@ -116,14 +122,15 @@ class _PaywallCreditPurchaseScreenState
                       onSelect: isBusy
                           ? () {}
                           : () => setState(() => _selectedTierId = tier.id),
-                      onPurchase: isBusy ? () {} : () => _completePurchase(tier),
+                      onPurchase:
+                          isBusy ? () {} : () => _completePurchase(tier),
                     );
                   }),
                   const SizedBox(height: InkSpacing.lg),
-                  Text('Ink Plus subscriptions', style: InkTypography.title2),
+                  Text('Monthly plans', style: InkTypography.title2),
                   const SizedBox(height: InkSpacing.sm),
                   Text(
-                    'Includes ${AppState.premiumMonthlyRenderCap} premium renders per month and no watermark.',
+                    'Tokens refresh every month. Cancel anytime.',
                     style: InkTypography.footnote,
                   ),
                   const SizedBox(height: InkSpacing.md),
@@ -135,7 +142,8 @@ class _PaywallCreditPurchaseScreenState
                       onSelect: isBusy
                           ? () {}
                           : () => setState(() => _selectedTierId = tier.id),
-                      onPurchase: isBusy ? () {} : () => _completePurchase(tier),
+                      onPurchase:
+                          isBusy ? () {} : () => _completePurchase(tier),
                     );
                   }),
                   const SizedBox(height: InkSpacing.md),

@@ -13,12 +13,12 @@ class InkChroniclesScreen extends StatelessWidget {
 
   static const List<Map<String, String>> _books = [
     {
-      'title': 'The Tattoo Bible',
+      'title': 'Superior Tattoo Bible',
       'author': 'Superior Tattoo',
       'description':
           'The definitive reference for tattoo flash art, covering every major style with hundreds of designs.',
       'category': 'REFERENCE',
-      'url': 'https://www.amazon.com/dp/1600610838',
+      'url': 'https://www.amazon.com/dp/1929133847?tag=Inknmotion20-20',
     },
     {
       'title': 'Bodies of Subversion',
@@ -26,7 +26,7 @@ class InkChroniclesScreen extends StatelessWidget {
       'description':
           'A secret history of women and tattoos — the most comprehensive account of women in tattoo culture.',
       'category': 'HISTORY',
-      'url': 'https://www.amazon.com/dp/0979007909',
+      'url': 'https://www.amazon.com/dp/1576876136?tag=Inknmotion20-20',
     },
     {
       'title': 'The Japanese Tattoo',
@@ -34,15 +34,7 @@ class InkChroniclesScreen extends StatelessWidget {
       'description':
           'Stunning photographic study of traditional Japanese irezumi and the masters behind it.',
       'category': 'JAPANESE',
-      'url': 'https://www.amazon.com/dp/0896599132',
-    },
-    {
-      'title': 'Tattooing the Invisible Man',
-      'author': 'Stay True Ink',
-      'description':
-          'Inside the world of professional tattoo artistry — technique, culture, and the business of ink.',
-      'category': 'TECHNIQUE',
-      'url': 'https://www.amazon.com/dp/0764316079',
+      'url': 'https://www.amazon.com/dp/0896597989?tag=Inknmotion20-20',
     },
     {
       'title': 'The Tattoo History Source Book',
@@ -50,7 +42,7 @@ class InkChroniclesScreen extends StatelessWidget {
       'description':
           'An anthology of historical records on tattooing from ancient times to the modern era.',
       'category': 'HISTORY',
-      'url': 'https://www.amazon.com/dp/1890451065',
+      'url': 'https://www.amazon.com/dp/1890451061?tag=Inknmotion20-20',
     },
     {
       'title': 'Tattoo Machine',
@@ -58,23 +50,34 @@ class InkChroniclesScreen extends StatelessWidget {
       'description':
           'A memoir from a tattooist on the front lines — raw, funny, and deeply human.',
       'category': 'MEMOIR',
-      'url': 'https://www.amazon.com/dp/0767931076',
+      'url': 'https://www.amazon.com/dp/0767931076?tag=Inknmotion20-20',
     },
     {
-      'title': 'The Art of Tattoo',
+      'title': '1000 Tattoos',
       'author': 'Henk Schiffmacher',
       'description':
           'A spectacular visual journey through 3,000 years of tattoo art from every culture on earth.',
       'category': 'ART',
-      'url': 'https://www.amazon.com/dp/3836555026',
+      'url':
+          'https://www.amazon.com/s?k=1000+Tattoos+Henk+Schiffmacher+Taschen&tag=Inknmotion20-20',
     },
     {
-      'title': 'Vintage Tattoo Flash Vol. 1',
-      'author': 'Tony Hundahl',
+      'title': 'The Tattoo Encyclopedia',
+      'author': 'Terisa Green',
+      'description':
+          'A guide to choosing your tattoo — covering over 1,000 symbols, their meanings, and origins.',
+      'category': 'REFERENCE',
+      'url':
+          'https://www.amazon.com/s?k=Tattoo+Encyclopedia+Terisa+Green&tag=Inknmotion20-20',
+    },
+    {
+      'title': 'Tattoo Flash Art Vol. 1',
+      'author': 'Various Artists',
       'description':
           'Classic American flash art from the golden age of tattooing — a collector\'s treasure.',
       'category': 'FLASH ART',
-      'url': 'https://www.amazon.com/dp/0764354493',
+      'url':
+          'https://www.amazon.com/s?k=Tattoo+Flash+Art+Vol+1+classic+american&tag=Inknmotion20-20',
     },
   ];
 

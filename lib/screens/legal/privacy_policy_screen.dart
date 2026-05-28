@@ -57,10 +57,9 @@ class PrivacyPolicyScreen extends StatelessWidget {
         LegalDocumentSection(
           heading: 'Credits & Subscriptions',
           body:
-              'Credit balances, daily usage limits, subscription status, and related '
-              'wallet data are stored locally on your device using secure on-device '
-              'storage (SharedPreferences). This data may sync to cloud services only '
-              'when account features are enabled in a future update.',
+              'Credit balances, subscription status, and wallet data are stored in '
+              'Firestore (cloud) associated with your device or account, and locally '
+              'on your device for offline access.',
         ),
         LegalDocumentSection(
           heading: 'Security',

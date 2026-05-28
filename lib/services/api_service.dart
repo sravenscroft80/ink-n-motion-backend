@@ -234,14 +234,6 @@ class ApiService {
     throw RateLimitException(message);
   }
 
-  static String _mimeTypeForPath(String path) {
-    final lower = path.toLowerCase();
-    if (lower.endsWith('.png')) return 'image/png';
-    if (lower.endsWith('.webp')) return 'image/webp';
-    if (lower.endsWith('.heic')) return 'image/heic';
-    return 'image/jpeg';
-  }
-
   static GenerateVideoResponse _parseGenerateMotionPayload(
     Map<String, dynamic> payload,
     Response<Map<String, dynamic>> response,

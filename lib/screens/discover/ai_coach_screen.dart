@@ -233,7 +233,7 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
                       Icon(CupertinoIcons.sparkles, color: _gold, size: 14),
                       SizedBox(width: 6),
                       Text(
-                        '1 free render per day  ·  Pro unlocks 3 variations',
+                        '1 free render per day  ·  Subscription unlocks 3 variations',
                         style: TextStyle(
                           color: _gold,
                           fontSize: 12,

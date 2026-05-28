@@ -57,22 +57,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            SizedBox(
-              height: viewportHeight * 0.42,
-              child: Stack(
-                children: [
-                  Positioned.fill(
-                    child: _DiscoverImmersiveHero(viewportHeight: viewportHeight),
-                  ),
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    top: 0,
-                    child: const _DiscoverWelcomeTypewriter(),
-                  ),
-                ],
-              ),
-            ),
+            _DiscoverHeroWithText(viewportHeight: viewportHeight),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: InkSpacing.md),
               child: Text(
@@ -223,7 +208,7 @@ class _DiscoverWelcomeTypewriterState extends State<_DiscoverWelcomeTypewriter> 
     return ConstrainedBox(
       constraints: const BoxConstraints(minHeight: 140),
       child: Container(
-        padding: const EdgeInsets.fromLTRB(24, 56, 24, 0),
+        padding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
         color: Colors.transparent,
         child: Column(
           children: [
@@ -267,17 +252,15 @@ class _DiscoverWelcomeTypewriterState extends State<_DiscoverWelcomeTypewriter> 
   }
 }
 
-class _DiscoverImmersiveHero extends StatelessWidget {
-  const _DiscoverImmersiveHero({required this.viewportHeight});
-
-  static const String _heroImageAsset = 'assets/images/discover_hero.png';
+class _DiscoverHeroWithText extends StatelessWidget {
+  const _DiscoverHeroWithText({required this.viewportHeight});
 
   final double viewportHeight;
 
   @override
   Widget build(BuildContext context) {
     final bleed = InkShellLayout.topBarContentHeight;
-    final heroHeight = viewportHeight * 0.40 + bleed;
+    final heroHeight = viewportHeight * 0.44 + bleed;
     final screenWidth = MediaQuery.sizeOf(context).width;
     final devicePixelRatio = MediaQuery.devicePixelRatioOf(context);
     final cacheWidth = (screenWidth * devicePixelRatio).round();
@@ -286,12 +269,11 @@ class _DiscoverImmersiveHero extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       height: heroHeight,
-      child: ClipRect(
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            Image.asset(
-              _heroImageAsset,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/discover_hero.png',
               fit: BoxFit.cover,
               alignment: Alignment.center,
               filterQuality: FilterQuality.high,
@@ -299,22 +281,32 @@ class _DiscoverImmersiveHero extends StatelessWidget {
               cacheHeight: cacheHeight,
               gaplessPlayback: true,
             ),
-            DecoratedBox(
+          ),
+          Positioned.fill(
+            child: DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    CupertinoColors.black.withValues(alpha: 0.18),
-                    CupertinoColors.black.withValues(alpha: 0.28),
+                    CupertinoColors.black.withValues(alpha: 0.35),
+                    CupertinoColors.black.withValues(alpha: 0.0),
+                    CupertinoColors.black.withValues(alpha: 0.0),
+                    CupertinoColors.black.withValues(alpha: 0.75),
                     InkColors.backgroundPrimary,
                   ],
-                  stops: const [0.0, 0.55, 1.0],
+                  stops: const [0.0, 0.2, 0.55, 0.82, 1.0],
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: const _DiscoverWelcomeTypewriter(),
+          ),
+        ],
       ),
     );
   }

@@ -34,7 +34,7 @@ class TermsOfServiceScreen extends StatelessWidget {
           heading: 'Age Requirement',
           body:
               'You must be at least 18 years of age to use premium features, including '
-              'paid credit packs and Ink Plus subscriptions. Users under 18 may only use '
+              'paid credit packs and Ink Spark, Ink Flow, or Ink Studio subscriptions. Users under 18 may only use '
               'free features with verifiable parental or guardian consent.',
         ),
         LegalDocumentSection(

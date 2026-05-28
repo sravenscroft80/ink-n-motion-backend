@@ -332,7 +332,7 @@ class _CoverupStudioScreenState extends State<CoverupStudioScreen> {
                       Icon(CupertinoIcons.sparkles, color: _gold, size: 14),
                       SizedBox(width: 6),
                       Text(
-                        '3 tokens per render  ·  First render free',
+                        '3 tokens per render  ·  First coverup free — lifetime',
                         style: TextStyle(
                           color: _gold,
                           fontSize: 12,

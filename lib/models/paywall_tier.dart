@@ -1,16 +1,18 @@
 /// Paywall purchase tier identifiers.
 enum PaywallTierId {
-  spark10,
-  creator30,
-  pro60,
-  plusMonthly,
-  plusAnnual,
+  introPack,
+  creatorPack,
+  studioPack,
+  sparkMonthly,
+  flowMonthly,
+  studioMonthly,
 }
 
 /// Optional promotional badge on a paywall card.
 enum PaywallBadge {
   mostPopular,
   bestValue,
+  artistDirectory,
 }
 
 /// Immutable paywall tier presentation + credit/subscription mapping.
@@ -35,63 +37,86 @@ class PaywallTier {
   final PaywallBadge? badge;
   final String? secondaryPriceLabel;
 
-  static const spark10 = PaywallTier(
-    id: PaywallTierId.spark10,
-    title: 'Spark Pack',
-    priceLabel: '\$2.99',
-    subtitle: '10 Credits',
-    creditsGranted: 10,
+  // ─── CREDIT PACKS ────────────────────────────────────────────────────────
+
+  /// $6.99 · 25 tokens · 2 full animations with 5 left over (casino pull).
+  static const introPack = PaywallTier(
+    id: PaywallTierId.introPack,
+    title: 'Intro Pack',
+    priceLabel: '\$6.99',
+    subtitle: '25 Tokens · Try the magic',
+    creditsGranted: 25,
     grantsPremium: false,
   );
 
-  static const creator30 = PaywallTier(
-    id: PaywallTierId.creator30,
+  /// $14.99 · 60 tokens · best pack value.
+  static const creatorPack = PaywallTier(
+    id: PaywallTierId.creatorPack,
     title: 'Creator Pack',
-    priceLabel: '\$6.99',
-    subtitle: '30 Credits',
-    creditsGranted: 30,
+    priceLabel: '\$14.99',
+    subtitle: '60 Tokens · More renders, more wow',
+    creditsGranted: 60,
     grantsPremium: false,
     badge: PaywallBadge.mostPopular,
   );
 
-  static const pro60 = PaywallTier(
-    id: PaywallTierId.pro60,
-    title: 'Pro Pack',
-    priceLabel: '\$12.99',
-    subtitle: '60 Credits',
-    creditsGranted: 60,
+  /// $27.99 · 130 tokens · makes monthly look like a deal.
+  static const studioPack = PaywallTier(
+    id: PaywallTierId.studioPack,
+    title: 'Studio Pack',
+    priceLabel: '\$27.99',
+    subtitle: '130 Tokens · Best pack value',
+    creditsGranted: 130,
     grantsPremium: false,
-  );
-
-  static const plusMonthly = PaywallTier(
-    id: PaywallTierId.plusMonthly,
-    title: 'Ink Plus Monthly',
-    priceLabel: '\$9.99/month',
-    subtitle: '30 premium renders / month · no watermark',
-    creditsGranted: 0,
-    grantsPremium: true,
-  );
-
-  static const plusAnnual = PaywallTier(
-    id: PaywallTierId.plusAnnual,
-    title: 'Ink Plus Annual',
-    priceLabel: '\$79.99/year',
-    subtitle: '30 premium renders / month · no watermark',
-    creditsGranted: 0,
-    grantsPremium: true,
     badge: PaywallBadge.bestValue,
-    secondaryPriceLabel: '\$6.67/mo',
   );
+
+  // ─── MONTHLY SUBSCRIPTIONS ───────────────────────────────────────────────
+
+  /// $8.99/mo · 50 tokens · entry subscription.
+  static const sparkMonthly = PaywallTier(
+    id: PaywallTierId.sparkMonthly,
+    title: 'Ink Spark',
+    priceLabel: '\$8.99/mo',
+    subtitle: '50 tokens / month · refreshed monthly',
+    creditsGranted: 50,
+    grantsPremium: true,
+  );
+
+  /// $14.99/mo · 110 tokens · sweet spot subscription.
+  static const flowMonthly = PaywallTier(
+    id: PaywallTierId.flowMonthly,
+    title: 'Ink Flow',
+    priceLabel: '\$14.99/mo',
+    subtitle: '110 tokens / month · best value',
+    creditsGranted: 110,
+    grantsPremium: true,
+    badge: PaywallBadge.mostPopular,
+  );
+
+  /// $24.99/mo · 300 tokens · studio/artist tier with directory badge.
+  static const studioMonthly = PaywallTier(
+    id: PaywallTierId.studioMonthly,
+    title: 'Ink Studio',
+    priceLabel: '\$24.99/mo',
+    subtitle: '300 tokens / month · Artist Directory badge (beta)',
+    creditsGranted: 300,
+    grantsPremium: true,
+    badge: PaywallBadge.artistDirectory,
+  );
+
+  // ─── LISTS ───────────────────────────────────────────────────────────────
 
   static const List<PaywallTier> creditPacks = [
-    spark10,
-    creator30,
-    pro60,
+    introPack,
+    creatorPack,
+    studioPack,
   ];
 
   static const List<PaywallTier> subscriptions = [
-    plusMonthly,
-    plusAnnual,
+    sparkMonthly,
+    flowMonthly,
+    studioMonthly,
   ];
 
   static const List<PaywallTier> all = [

@@ -2,9 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 /// Token costs for each feature — single source of truth.
 abstract final class InkTokenCost {
-  static const int animateMyInk = 10;
-  static const int coverupStudio = 3;
-  static const int aiConcept = 1;
+  static const int animateMyInk = 10; // 10-second animation
+  static const int coverupStudio = 3; // AI coverup render
+  static const int aiConcept = 1; // AI concept sketch
 }
 
 /// The user's wallet document, deserialized from Firestore.
@@ -14,7 +14,7 @@ class InkWallet {
   final bool freeVideoUsed;
   final bool freeCoverUpUsed;
   final String? lastFreeConceptDate; // "YYYY-MM-DD"
-  final String? subscriptionTier; // "starter"|"plus"|"pro"|"studio"|null
+  final String? subscriptionTier; // "spark"|"flow"|"studio"|null
   final DateTime? subscriptionRenewalDate;
   final int totalRendersCompleted;
   final String referralCode;
@@ -33,7 +33,7 @@ class InkWallet {
     required this.createdAt,
   });
 
-  /// Total spendable balance — subscription first, then purchased.
+  /// Total spendable balance — subscription tokens first, then purchased.
   int get totalBalance => subscriptionTokens + purchasedTokens;
 
   /// Today's date string in YYYY-MM-DD format (UTC).
@@ -110,8 +110,8 @@ class FirestoreWalletService {
 
   // ─── CREATE ──────────────────────────────────────────────────────────────
 
-  /// Called once on first sign-in. Creates wallet with 10 purchased tokens.
-  /// Uses set with merge:true so it's safe to call multiple times.
+  /// Called once on first sign-in. Creates wallet with 10 welcome tokens.
+  /// Uses set with merge:true so it is safe to call multiple times.
   Future<void> initializeWallet(String uid) async {
     final ref = _walletRef(uid);
     final snap = await ref.get();
@@ -121,7 +121,7 @@ class FirestoreWalletService {
 
     await ref.set({
       'subscriptionTokens': 0,
-      'purchasedTokens': 10, // welcome gift — covers first free animation
+      'purchasedTokens': 10, // 10-token welcome gift — covers first free animation
       'freeVideoUsed': false,
       'freeCoverUpUsed': false,
       'lastFreeConceptDate': null,
@@ -163,8 +163,7 @@ class FirestoreWalletService {
 
   // ─── FREE USAGE CHECKS & CLAIMS ─────────────────────────────────────────
 
-  /// Check + claim the free daily concept. Returns true if free render
-  /// is available and marks it used for today.
+  /// Check + claim the free daily concept. Returns true if available today.
   Future<bool> claimFreeDailyConcept(String uid) async {
     final wallet = await getWallet(uid);
     if (wallet == null) return false;
@@ -198,7 +197,7 @@ class FirestoreWalletService {
 
   // ─── ADD TOKENS ──────────────────────────────────────────────────────────
 
-  /// Add purchased tokens (never expire). Used after IAP purchase.
+  /// Add purchased tokens (never expire). Used after IAP pack purchase.
   Future<void> addPurchasedTokens(String uid, int amount) async {
     await _walletRef(uid).update({
       'purchasedTokens': FieldValue.increment(amount),
@@ -219,19 +218,20 @@ class FirestoreWalletService {
     });
   }
 
-  /// Add social share bonus (one time — 5 tokens).
+  /// Add social share bonus — 5 tokens (one time).
   Future<void> addSocialShareBonus(String uid) async {
     await _walletRef(uid).update({
       'purchasedTokens': FieldValue.increment(5),
     });
   }
 
-  // ─── SUBSCRIPTION EXPIRY ─────────────────────────────────────────────────
+  // ─── SUBSCRIPTION EXPIRY / RENEWAL ───────────────────────────────────────
 
-  /// Called when a subscription renews or expires.
-  /// If expired: zero out subscription tokens.
-  /// If renewed: grant new monthly tokens based on tier.
-  Future<void> handleSubscriptionRenewal(String uid, {
+  /// Called when a subscription renews or expires via RevenueCat webhook.
+  /// If tier is null (expired): zeroes out subscription tokens.
+  /// If tier is set (renewed): grants new monthly allocation.
+  Future<void> handleSubscriptionRenewal(
+    String uid, {
     required String? tier,
     required DateTime? renewalDate,
   }) async {
@@ -254,16 +254,16 @@ class FirestoreWalletService {
     return 'INK$suffix';
   }
 
+  /// Monthly token allocation per subscription tier.
+  /// Tiers: "spark" · "flow" · "studio"
   int _tokensForTier(String? tier) {
     switch (tier) {
-      case 'starter':
+      case 'spark':
         return 50;
-      case 'plus':
-        return 120;
-      case 'pro':
-        return 250;
+      case 'flow':
+        return 110;
       case 'studio':
-        return 1200;
+        return 300;
       default:
         return 0;
     }

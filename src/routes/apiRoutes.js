@@ -1,6 +1,10 @@
 const express = require('express');
 const multer = require('multer');
 const { submitKlingJob, pollKlingJob } = require('../studio/klingProvider');
+const {
+  generateConceptImage,
+  generateCoverupImage,
+} = require('../services/openAiMockupService');
 const { logger } = require('../utils/logger');
 
 const router = express.Router();
@@ -121,10 +125,21 @@ router.post('/generate-concept', async (req, res) => {
     style: style || null,
   });
 
-  // TODO: wire to DALL-E or Stability AI
-  return res.status(200).json({
-    imageUrl: `https://picsum.photos/seed/${Date.now()}/400/400`,
-  });
+  try {
+    const { imageUrl } = await generateConceptImage({ prompt, style });
+    return res.status(200).json({ imageUrl });
+  } catch (error) {
+    logger.error('API generate-concept failed', {
+      code: error.code || 'concept_generation_failed',
+      message: error.message,
+    });
+
+    const statusCode = Number.isInteger(error.statusCode) ? error.statusCode : 502;
+    return res.status(statusCode).json({
+      error: error.code || 'concept_generation_failed',
+      message: error.message || 'Unable to generate concept image.',
+    });
+  }
 });
 
 // ─── POST /api/generate-coverup ─────────────────────────────────────────────
@@ -140,10 +155,24 @@ router.post('/generate-coverup', upload.single('image'), async (req, res) => {
     return res.status(400).json({ error: 'bad_request', message: 'Missing image file' });
   }
 
-  // TODO: wire to inpainting API
-  return res.status(200).json({
-    imageUrl: `https://picsum.photos/seed/${Date.now() + 1}/400/400`,
-  });
+  try {
+    const { imageUrl } = await generateCoverupImage({
+      imageBuffer: req.file.buffer,
+      prompt,
+    });
+    return res.status(200).json({ imageUrl });
+  } catch (error) {
+    logger.error('API generate-coverup failed', {
+      code: error.code || 'coverup_generation_failed',
+      message: error.message,
+    });
+
+    const statusCode = Number.isInteger(error.statusCode) ? error.statusCode : 502;
+    return res.status(statusCode).json({
+      error: error.code || 'coverup_generation_failed',
+      message: error.message || 'Unable to generate coverup image.',
+    });
+  }
 });
 
 module.exports = router;

@@ -33,14 +33,14 @@ class _OnboardingCarouselScreenState extends ConsumerState<OnboardingCarouselScr
       icon: CupertinoIcons.wand_stars,
       title: 'Design Your Vision',
       subtitle:
-          'Describe your dream tattoo and get an AI-generated concept in seconds. Free every day — no account needed.',
+          'Describe your dream tattoo and get an AI-generated concept in seconds. Free every day.',
       accent: Color(0xFF4FC3F7),
     ),
     _CarouselCardData(
       icon: CupertinoIcons.play_circle,
       title: 'Bring Your Ink to Life',
       subtitle:
-          'Animate your tattoo into a stunning 10-second video. Coverups, concepts, and animations — all in one app.',
+          'Animate, coverup, and create — all in one app. Start with 10 free tokens on us.',
       accent: Color(0xFFD4AF37),
     ),
   ];

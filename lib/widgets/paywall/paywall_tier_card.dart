@@ -127,6 +127,7 @@ class _TierBadge extends StatelessWidget {
     final label = switch (badge) {
       PaywallBadge.mostPopular => 'Most Popular',
       PaywallBadge.bestValue => 'Best Value',
+      PaywallBadge.artistDirectory => '🎨 Artist Directory',
     };
 
     return Container(

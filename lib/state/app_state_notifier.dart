@@ -144,55 +144,29 @@ class AppStateNotifier extends StateNotifier<AppState> {
     if (!status.isAvailable) return;
     applyPremiumEntitlement(status.hasProEntitlement);
   }
-  Future<bool> purchaseSparkPack() async {
+
+  /// Shared helper for all consumable (non-subscription) pack purchases.
+  Future<bool> _purchasePack(String productId) async {
     try {
       final customerInfo = await BillingService.purchaseProduct(
-        BillingProductIds.spark10,
+        productId,
         isSubscription: false,
       );
       if (customerInfo == null) return false;
-      addCredits(PaywallCredits.spark10);
+      addCredits(BillingProductIds.tokensForProduct(productId));
       await InkHaptics.purchaseSuccess();
       return true;
     } catch (error, stackTrace) {
-      _logPurchaseFailure('purchaseSparkPack', error, stackTrace);
+      _logPurchaseFailure('_purchasePack($productId)', error, stackTrace);
       return false;
     }
   }
-  Future<bool> purchaseCreatorPack() async {
+
+  /// Shared helper for all subscription purchases.
+  Future<bool> _purchaseSubscription(String productId) async {
     try {
       final customerInfo = await BillingService.purchaseProduct(
-        BillingProductIds.creator30,
-        isSubscription: false,
-      );
-      if (customerInfo == null) return false;
-      addCredits(PaywallCredits.creator30);
-      await InkHaptics.purchaseSuccess();
-      return true;
-    } catch (error, stackTrace) {
-      _logPurchaseFailure('purchaseCreatorPack', error, stackTrace);
-      return false;
-    }
-  }
-  Future<bool> purchaseProPack() async {
-    try {
-      final customerInfo = await BillingService.purchaseProduct(
-        BillingProductIds.pro60,
-        isSubscription: false,
-      );
-      if (customerInfo == null) return false;
-      addCredits(PaywallCredits.pro60);
-      await InkHaptics.purchaseSuccess();
-      return true;
-    } catch (error, stackTrace) {
-      _logPurchaseFailure('purchaseProPack', error, stackTrace);
-      return false;
-    }
-  }
-  Future<bool> purchasePlusMonthly() async {
-    try {
-      final customerInfo = await BillingService.purchaseProduct(
-        BillingProductIds.plusMonthly,
+        productId,
         isSubscription: true,
       );
       if (customerInfo == null) return false;
@@ -200,25 +174,33 @@ class AppStateNotifier extends StateNotifier<AppState> {
       await InkHaptics.purchaseSuccess();
       return true;
     } catch (error, stackTrace) {
-      _logPurchaseFailure('purchasePlusMonthly', error, stackTrace);
-      return false;
-    }
-  }
-  Future<bool> purchasePlusAnnual() async {
-    try {
-      final customerInfo = await BillingService.purchaseProduct(
-        BillingProductIds.plusAnnual,
-        isSubscription: true,
+      _logPurchaseFailure(
+        '_purchaseSubscription($productId)',
+        error,
+        stackTrace,
       );
-      if (customerInfo == null) return false;
-      await syncPremiumFromRevenueCat();
-      await InkHaptics.purchaseSuccess();
-      return true;
-    } catch (error, stackTrace) {
-      _logPurchaseFailure('purchasePlusAnnual', error, stackTrace);
       return false;
     }
   }
+
+  Future<bool> purchaseIntroPack() =>
+      _purchasePack(BillingProductIds.introPack);
+
+  Future<bool> purchaseCreatorPack() =>
+      _purchasePack(BillingProductIds.creatorPack);
+
+  Future<bool> purchaseStudioPack() =>
+      _purchasePack(BillingProductIds.studioPack);
+
+  Future<bool> purchaseSparkMonthly() =>
+      _purchaseSubscription(BillingProductIds.sparkMonthly);
+
+  Future<bool> purchaseFlowMonthly() =>
+      _purchaseSubscription(BillingProductIds.flowMonthly);
+
+  Future<bool> purchaseStudioMonthly() =>
+      _purchaseSubscription(BillingProductIds.studioMonthly);
+
   /// Grants share-to-unlock bonus credits once per calendar day.
   Future<bool> grantShareUnlockCredits() async {
     if (!await _storage.canUseShareUnlockToday()) return false;
@@ -701,10 +683,4 @@ class AppStateNotifier extends StateNotifier<AppState> {
       _commit(state.copyWith(isAccountFlaggedForReview: true));
     }
   }
-}
-/// Credit amounts granted by consumable IAP tiers (mirrors [PaywallTier]).
-abstract final class PaywallCredits {
-  static const int spark10 = 10;
-  static const int creator30 = 30;
-  static const int pro60 = 60;
 }

@@ -621,7 +621,7 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
                       Icon(CupertinoIcons.sparkles, color: _gold, size: 14),
                       SizedBox(width: 6),
                       Text(
-                        '10 tokens per render  ·  First render free',
+                        '10 tokens per render  ·  First animation free — lifetime',
                         style: TextStyle(
                           color: _gold,
                           fontSize: 12,

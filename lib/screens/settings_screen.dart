@@ -55,6 +55,27 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 
+  void _showAffiliateDisclosure() {
+    showCupertinoDialog<void>(
+      context: context,
+      builder: (ctx) => CupertinoAlertDialog(
+        title: const Text('Affiliate Disclosure'),
+        content: const Text(
+          'Ink-N-Motion participates in the Amazon Associates program. '
+          'Some links in the Resource Library are affiliate links — we may earn a '
+          'small commission if you purchase through them, at no extra cost to you.',
+        ),
+        actions: [
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _rateApp() {
     showCupertinoDialog<void>(
       context: context,
@@ -164,7 +185,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         CupertinoIcons.money_dollar_circle_fill,
                         color: _gold,
                       ),
-                      title: const Text('Credit Balance'),
+                      title: const Text('Token Balance'),
                       additionalInfo: Text(balanceLabel),
                       trailing: const CupertinoListTileChevron(),
                       onTap: _openPaywall,
@@ -174,7 +195,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 CupertinoListTile(
                   title: const Text('Subscription'),
                   additionalInfo: Text(
-                    appState.isPremiumSubscriber ? 'Ink Plus ✦' : 'Free',
+                    appState.isPremiumSubscriber ? 'Active ✦' : 'Free',
                   ),
                   trailing: const CupertinoListTileChevron(),
                   onTap: _openPaywall,
@@ -189,7 +210,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ),
                 if (!appState.isPremiumSubscriber)
                   CupertinoListTile(
-                    title: const Text('Easy Videos Today'),
+                    title: const Text('Free Renders Today'),
                     additionalInfo: Text(
                       '${appState.easyRendersRemainingToday} / '
                       '${AppState.freeEasyRendersPerDay} remaining',
@@ -210,7 +231,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
           // ② HOW CREDITS WORK
           const SliverToBoxAdapter(
-            child: SettingsSectionHeader(label: 'HOW CREDITS WORK'),
+            child: SettingsSectionHeader(label: 'HOW TOKENS WORK'),
           ),
           SliverToBoxAdapter(
             child: Padding(
@@ -299,6 +320,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   title: const Text('About Ink-N-Motion'),
                   trailing: const CupertinoListTileChevron(),
                   onTap: () => pushCupertino(context, const AboutScreen()),
+                ),
+                CupertinoListTile(
+                  title: const Text('Affiliate Disclosure'),
+                  trailing: const CupertinoListTileChevron(),
+                  onTap: _showAffiliateDisclosure,
                 ),
               ],
             ),

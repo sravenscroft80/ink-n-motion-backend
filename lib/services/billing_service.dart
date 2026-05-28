@@ -7,12 +7,52 @@ import 'package:ink_n_motion/models/entitlement_status.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 /// Production RevenueCat product identifiers (App Store / Google Play).
+/// Must match exactly what is configured in the RevenueCat dashboard.
 abstract final class BillingProductIds {
-  static const String spark10 = 'ink_spark_10';
-  static const String creator30 = 'ink_creator_30';
-  static const String pro60 = 'ink_pro_60';
-  static const String plusMonthly = 'ink_plus_monthly';
-  static const String plusAnnual = 'ink_plus_annual';
+  // ─── Credit packs (non-subscription) ────────────────────────────────────
+  static const String introPack = 'ink_intro_pack'; // $6.99  · 25 tokens
+  static const String creatorPack = 'ink_creator_pack'; // $14.99 · 60 tokens
+  static const String studioPack = 'ink_studio_pack'; // $27.99 · 130 tokens
+
+  // ─── Monthly subscriptions ───────────────────────────────────────────────
+  static const String sparkMonthly = 'ink_spark_monthly'; // $8.99/mo  · 50 tokens
+  static const String flowMonthly = 'ink_flow_monthly'; // $14.99/mo · 110 tokens
+  static const String studioMonthly = 'ink_studio_monthly'; // $24.99/mo · 300 tokens
+
+  /// Maps a product ID → token grant for local wallet credit after purchase.
+  static int tokensForProduct(String productId) {
+    switch (productId) {
+      case introPack:
+        return 25;
+      case creatorPack:
+        return 60;
+      case studioPack:
+        return 130;
+      case sparkMonthly:
+        return 50;
+      case flowMonthly:
+        return 110;
+      case studioMonthly:
+        return 300;
+      default:
+        return 0;
+    }
+  }
+
+  /// Maps a product ID → subscription tier string stored in Firestore.
+  /// Returns null for non-subscription (credit pack) products.
+  static String? tierForProduct(String productId) {
+    switch (productId) {
+      case sparkMonthly:
+        return 'spark';
+      case flowMonthly:
+        return 'flow';
+      case studioMonthly:
+        return 'studio';
+      default:
+        return null;
+    }
+  }
 }
 
 /// RevenueCat entitlement identifiers configured in the dashboard.
@@ -120,7 +160,7 @@ abstract final class BillingService {
     }
   }
 
-  /// Returns the current RevenueCat app user id (anonymous before [linkToFirebaseUser]).
+  /// Returns the current RevenueCat app user id.
   static Future<String?> currentAppUserId() async {
     if (!_isConfigured) return null;
     try {
@@ -157,7 +197,8 @@ abstract final class BillingService {
     required bool isSubscription,
   }) async {
     if (!_isConfigured) {
-      debugPrint('BillingService: SDK not configured — skipping purchase for $productId');
+      debugPrint(
+          'BillingService: SDK not configured — skipping purchase for $productId');
       return null;
     }
 
@@ -174,7 +215,8 @@ abstract final class BillingService {
         return null;
       }
 
-      final customerInfo = await Purchases.purchaseStoreProduct(products.first);
+      final customerInfo =
+          await Purchases.purchaseStoreProduct(products.first);
       return customerInfo;
     } on PlatformException catch (error) {
       final errorCode = PurchasesErrorHelper.getErrorCode(error);
