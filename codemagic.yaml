@@ -6,9 +6,6 @@ workflows:
     integrations:
       app_store_connect: Codemagic_InkNMotion
     environment:
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: com.inknmotion.app
       vars:
         BUNDLE_ID: com.inknmotion.app
         XCODE_WORKSPACE: ios/Runner.xcworkspace
@@ -23,6 +20,15 @@ workflows:
         script: flutter packages pub get
       - name: Flutter analyze
         script: flutter analyze
+      - name: Set up signing with code signing manager
+        script: |
+          app-store-connect fetch-signing-files "com.inknmotion.app" \
+            --type IOS_APP_STORE \
+            --create
+          keychain initialize
+          keychain add-certificates
+          xcode-project use-profiles
+
       - name: Generate export options
         script: |
           cat > /Users/builder/export_options.plist <<EOF
@@ -33,7 +39,7 @@ workflows:
             <key>method</key>
             <string>app-store</string>
             <key>signingStyle</key>
-            <string>automatic</string>
+            <string>manual</string>
             <key>teamID</key>
             <string>88U448KLJ8</string>
           </dict>
