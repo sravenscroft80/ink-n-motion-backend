@@ -20,37 +20,17 @@ workflows:
         script: flutter packages pub get
       - name: Flutter analyze
         script: flutter analyze
-      - name: Set up signing with code signing manager
+      - name: Set up code signing
         script: |
           keychain initialize
-          app-store-connect fetch-signing-files "com.inknmotion.app" \
-            --type IOS_APP_STORE \
-            --create
+          app-store-connect create-certificate --type IOS_DISTRIBUTION --save || true
+          app-store-connect fetch-signing-files "com.inknmotion.app" --type IOS_APP_STORE --create
           keychain add-certificates
           xcode-project use-profiles
 
-      - name: Generate export options
-        script: |
-          cat > /Users/builder/export_options.plist <<EOF
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-            <key>method</key>
-            <string>app-store</string>
-            <key>signingStyle</key>
-            <string>manual</string>
-            <key>teamID</key>
-            <string>88U448KLJ8</string>
-          </dict>
-          </plist>
-          EOF
-
       - name: Build iOS IPA
         script: |
-          xcode-project build-ipa \
-            --workspace "$XCODE_WORKSPACE" \
-            --scheme "$XCODE_SCHEME"
+          flutter build ipa --release
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
