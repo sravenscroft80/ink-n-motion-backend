@@ -4,7 +4,7 @@ workflows:
     max_build_duration: 60
     instance_type: mac_mini_m2
     integrations:
-      app_store_connect: Codemagic_InkNMotion
+      app_store_connect: Codemagic_AstroDots
     environment:
       vars:
         BUNDLE_ID: com.inknmotion.app
@@ -22,10 +22,10 @@ workflows:
         script: flutter analyze
       - name: Set up signing with code signing manager
         script: |
+          keychain initialize
           app-store-connect fetch-signing-files "com.inknmotion.app" \
             --type IOS_APP_STORE \
             --create
-          keychain initialize
           keychain add-certificates
           xcode-project use-profiles
 
