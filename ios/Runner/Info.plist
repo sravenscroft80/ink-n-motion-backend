@@ -6,6 +6,12 @@
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Ink N Motion uses your camera so you can take photos of your body to preview tattoo designs.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Ink N Motion needs access to your photos so you can upload images to create and preview tattoo designs.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Ink N Motion saves your generated tattoo designs to your photo library.</string>
 	<key>CFBundleDisplayName</key>
 	<string>Ink N Motion</string>
 	<key>CFBundleExecutable</key>
