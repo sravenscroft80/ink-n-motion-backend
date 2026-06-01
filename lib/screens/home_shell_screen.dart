@@ -33,7 +33,16 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
   }
 
   void _syncShellTabProvider() {
+    setState(() {});
     ref.read(shellTabIndexProvider.notifier).state = _tabController.index;
+  }
+
+  void _onSystemBackInvoked(bool didPop, Object? result) {
+    if (didPop) return;
+    if (_tabController.index != 0) {
+      _tabController.index = 0;
+      ref.read(shellTabIndexProvider.notifier).state = 0;
+    }
   }
 
   @override
@@ -44,7 +53,10 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
       }
     });
 
-    return CupertinoPageScaffold(
+    return PopScope(
+      canPop: _tabController.index == 0,
+      onPopInvokedWithResult: _onSystemBackInvoked,
+      child: CupertinoPageScaffold(
       backgroundColor: InkColors.backgroundPrimary,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -92,6 +104,7 @@ class _HomeShellScreenState extends ConsumerState<HomeShellScreen> {
             ),
           ),
         ],
+      ),
       ),
     );
   }
