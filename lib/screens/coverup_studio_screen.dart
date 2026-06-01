@@ -149,10 +149,7 @@ class _CoverupStudioScreenState extends State<CoverupStudioScreen>
       return;
     }
 
-    bool isFreeRender = false;
-    if (!wallet.freeCoverUpUsed) {
-      isFreeRender = true;
-    } else if (wallet.totalBalance < InkTokenCost.coverupStudio) {
+    if (wallet.totalBalance < InkTokenCost.coverupStudio) {
       _showNotice(
         'You need 3 tokens for a coverup render. Visit the store to top up.',
         title: 'Not Enough Tokens',
@@ -206,14 +203,10 @@ class _CoverupStudioScreenState extends State<CoverupStudioScreen>
               ? resultBytes
               : null;
         });
-        if (isFreeRender) {
-          await FirestoreWalletService.instance.claimFreeCoverUp(uid);
-        } else {
-          await FirestoreWalletService.instance.deductTokens(
-            uid,
-            InkTokenCost.coverupStudio,
-          );
-        }
+        await FirestoreWalletService.instance.deductTokens(
+          uid,
+          InkTokenCost.coverupStudio,
+        );
       } else {
         setState(() {
           _errorMessage = 'Server error. Please try again.';
@@ -354,11 +347,6 @@ class _CoverupStudioScreenState extends State<CoverupStudioScreen>
         'Unable to load your token balance. Please try again.',
         title: 'Wallet Error',
       );
-      return;
-    }
-
-    if (!wallet.freeCoverUpUsed) {
-      await _generateCoverup(isVariation: true);
       return;
     }
 
@@ -577,7 +565,7 @@ class _CoverupStudioScreenState extends State<CoverupStudioScreen>
                       Icon(CupertinoIcons.sparkles, color: _gold, size: 14),
                       SizedBox(width: 6),
                       Text(
-                        '3 tokens per render · First coverup free — lifetime',
+                        '3 tokens per render',
                         style: TextStyle(color: _gold, fontSize: 12),
                       ),
                     ],

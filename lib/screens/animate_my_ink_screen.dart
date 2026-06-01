@@ -210,12 +210,7 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
       return;
     }
 
-    // 3. Check free lifetime claim first
-    bool isFreeRender = false;
-    if (!wallet.freeVideoUsed) {
-      isFreeRender = true;
-    } else if (wallet.totalBalance < InkTokenCost.animateMyInk) {
-      // Not enough tokens — push to paywall
+    if (wallet.totalBalance < InkTokenCost.animateMyInk) {
       _showNotice(
         'You need 10 tokens to animate. Visit the store to top up.',
         title: 'Not Enough Tokens',
@@ -301,15 +296,10 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
             _videoUrl = videoUrl;
             _pollStatus = 'Complete!';
           });
-          // Deduct tokens or claim free render
-          if (isFreeRender) {
-            await FirestoreWalletService.instance.claimFreeVideo(uid);
-          } else {
-            await FirestoreWalletService.instance.deductTokens(
-              uid,
-              InkTokenCost.animateMyInk,
-            );
-          }
+          await FirestoreWalletService.instance.deductTokens(
+            uid,
+            InkTokenCost.animateMyInk,
+          );
           break;
         }
 
@@ -768,7 +758,7 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
                       Icon(CupertinoIcons.sparkles, color: _gold, size: 14),
                       SizedBox(width: 6),
                       Text(
-                        '10 tokens per render  ·  First animation free — lifetime',
+                        '10 tokens per render',
                         style: TextStyle(
                           color: _gold,
                           fontSize: 12,
