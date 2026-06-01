@@ -3,8 +3,13 @@ import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:ink_n_motion/services/firestore_wallet_service.dart';
+import 'package:ink_n_motion/utils/app_links.dart';
+import 'package:ink_n_motion/utils/concept_image_loader.dart';
+import 'package:ink_n_motion/utils/save_concept_image.dart';
+import 'package:share_plus/share_plus.dart';
 
 /// AI Concept Generator — single-prompt 2D tattoo concept renders.
 class AiCoachScreen extends StatefulWidget {
@@ -158,12 +163,78 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
     );
   }
 
-  void _saveImage() {
-    _showNotice('Right-click the image to save');
+  Future<void> _saveImage() async {
+    final url = _generatedImageUrl;
+    if (url == null || url.isEmpty) {
+      _showNotice('Nothing to save yet.');
+      return;
+    }
+
+    if (kIsWeb) {
+      _showNotice('Right-click the image to save');
+      return;
+    }
+
+    try {
+      final bytes = await loadConceptImageBytes(url);
+      if (bytes == null || bytes.isEmpty) {
+        _showNotice('Unable to download image. Please try again.');
+        return;
+      }
+
+      final saved = await saveConceptImage(bytes, filename: 'ink_concept');
+      if (!mounted) return;
+      if (saved) {
+        _showNotice('Image saved to your photos!');
+      } else {
+        _showNotice(
+          'Unable to save image. Allow Photos access and try again.',
+        );
+      }
+    } catch (_) {
+      if (!mounted) return;
+      _showNotice('Unable to save image. Please try again.');
+    }
   }
 
-  void _shareImage() {
-    _showNotice('Share coming soon');
+  Future<void> _shareImage() async {
+    final url = _generatedImageUrl;
+    if (url == null || url.isEmpty) {
+      _showNotice('Nothing to share yet.');
+      return;
+    }
+
+    if (kIsWeb) {
+      await SharePlus.instance.share(
+        ShareParams(text: kShareMessage),
+      );
+      return;
+    }
+
+    try {
+      final bytes = await loadConceptImageBytes(url);
+      if (!mounted) return;
+      if (bytes == null || bytes.isEmpty) {
+        _showNotice('Unable to download image. Please try again.');
+        return;
+      }
+
+      await SharePlus.instance.share(
+        ShareParams(
+          text: kShareMessage,
+          files: [
+            XFile.fromData(
+              bytes,
+              name: 'ink_concept.png',
+              mimeType: 'image/png',
+            ),
+          ],
+        ),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      _showNotice('Unable to share image. Please try again.');
+    }
   }
 
   @override
@@ -346,29 +417,8 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
                         border: Border.all(color: _border),
                       ),
                       clipBehavior: Clip.antiAlias,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.network(
-                          _generatedImageUrl!,
-                          fit: BoxFit.contain,
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return const Center(
-                              child: CupertinoActivityIndicator(
-                                color: _gold,
-                              ),
-                            );
-                          },
-                          errorBuilder: (context, error, stackTrace) {
-                            return const Center(
-                              child: Icon(
-                                CupertinoIcons.photo,
-                                color: _snippetGrey,
-                                size: 48,
-                              ),
-                            );
-                          },
-                        ),
+                      child: _ConceptResultImage(
+                        imageUrl: _generatedImageUrl!,
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -405,6 +455,187 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Loads concept bytes (https or data URI) and displays them with retry + fullscreen tap.
+class _ConceptResultImage extends StatefulWidget {
+  const _ConceptResultImage({required this.imageUrl});
+
+  final String imageUrl;
+
+  @override
+  State<_ConceptResultImage> createState() => _ConceptResultImageState();
+}
+
+class _ConceptResultImageState extends State<_ConceptResultImage> {
+  static const Color _gold = Color(0xFFD4AF37);
+  static const Color _snippetGrey = Color(0xFF999999);
+
+  Uint8List? _bytes;
+  bool _loading = true;
+  bool _failed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    unawaited(_loadImage());
+  }
+
+  @override
+  void didUpdateWidget(_ConceptResultImage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.imageUrl != widget.imageUrl) {
+      unawaited(_loadImage());
+    }
+  }
+
+  Future<void> _loadImage() async {
+    setState(() {
+      _loading = true;
+      _failed = false;
+      _bytes = null;
+    });
+
+    try {
+      final bytes = await loadConceptImageBytes(widget.imageUrl);
+      if (!mounted) return;
+
+      if (bytes == null || bytes.isEmpty) {
+        setState(() {
+          _loading = false;
+          _failed = true;
+        });
+        return;
+      }
+
+      setState(() {
+        _bytes = bytes;
+        _loading = false;
+        _failed = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _loading = false;
+        _failed = true;
+      });
+    }
+  }
+
+  void _openFullscreen() {
+    final bytes = _bytes;
+    if (bytes == null) return;
+    _ConceptFullscreenPreview.open(context, bytes);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_loading) {
+      return const Center(
+        child: CupertinoActivityIndicator(color: _gold),
+      );
+    }
+
+    if (_failed || _bytes == null) {
+      return GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: _loadImage,
+        child: const Center(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 24),
+            child: Text(
+              "Couldn't load image — tap to retry",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: _snippetGrey,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: _openFullscreen,
+      child: Image.memory(
+        _bytes!,
+        fit: BoxFit.contain,
+        errorBuilder: (context, error, stackTrace) {
+          return GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: _loadImage,
+            child: const Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24),
+                child: Text(
+                  "Couldn't load image — tap to retry",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: _snippetGrey,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _ConceptFullscreenPreview extends StatelessWidget {
+  const _ConceptFullscreenPreview({required this.imageBytes});
+
+  final Uint8List imageBytes;
+
+  static void open(BuildContext context, Uint8List bytes) {
+    Navigator.of(context).push(
+      CupertinoPageRoute<void>(
+        builder: (_) => _ConceptFullscreenPreview(imageBytes: bytes),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return CupertinoPageScaffold(
+      backgroundColor: CupertinoColors.black,
+      child: SafeArea(
+        child: Stack(
+          children: [
+            Center(
+              child: InteractiveViewer(
+                minScale: 0.5,
+                maxScale: 4,
+                child: Image.memory(
+                  imageBytes,
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+            Positioned(
+              top: 8,
+              left: 8,
+              child: CupertinoButton(
+                padding: EdgeInsets.zero,
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Icon(
+                  CupertinoIcons.xmark,
+                  color: CupertinoColors.white,
+                  size: 28,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
