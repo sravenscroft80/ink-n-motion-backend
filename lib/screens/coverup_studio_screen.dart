@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:ink_n_motion/services/firestore_wallet_service.dart';
 import 'package:ink_n_motion/utils/concept_image_loader.dart';
+import 'package:ink_n_motion/utils/save_concept_image.dart';
 import 'package:ink_n_motion/screens/coverup_studio_picker.dart'
     if (dart.library.html) 'package:ink_n_motion/screens/coverup_studio_picker_web.dart'
     if (dart.library.io) 'package:ink_n_motion/screens/coverup_studio_picker_io.dart';
@@ -42,6 +43,7 @@ class _CoverupStudioScreenState extends State<CoverupStudioScreen>
   Uint8List? _selectedImageBytes;
   String? _selectedImageName;
   String? _resultImageUrl;
+  Uint8List? _resultImageBytes;
   String? _errorMessage;
 
   // Reveal mode
@@ -127,6 +129,7 @@ class _CoverupStudioScreenState extends State<CoverupStudioScreen>
       _isGenerating = true;
       _errorMessage = null;
       _resultImageUrl = null;
+      _resultImageBytes = null;
       _revealMode = _RevealMode.none;
       _sliderPosition = 0.5;
       _shimmerRunning = false;
@@ -157,8 +160,16 @@ class _CoverupStudioScreenState extends State<CoverupStudioScreen>
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
+        final imageUrl = data['imageUrl'] as String?;
+        final resultBytes = imageUrl != null && imageUrl.isNotEmpty
+            ? await loadConceptImageBytes(imageUrl)
+            : null;
+        if (!mounted) return;
         setState(() {
-          _resultImageUrl = data['imageUrl'] as String?;
+          _resultImageUrl = imageUrl;
+          _resultImageBytes = (resultBytes != null && resultBytes.isNotEmpty)
+              ? resultBytes
+              : null;
         });
         if (isFreeRender) {
           await FirestoreWalletService.instance.claimFreeCoverUp(uid);
@@ -220,8 +231,8 @@ class _CoverupStudioScreenState extends State<CoverupStudioScreen>
   }
 
   Future<void> _saveImage() async {
-    final imageUrl = _resultImageUrl;
-    if (imageUrl == null || imageUrl.isEmpty) return;
+    final bytes = _resultImageBytes;
+    if (bytes == null || bytes.isEmpty) return;
 
     if (kIsWeb) {
       _showNotice('Right-click the image to save');
@@ -230,28 +241,14 @@ class _CoverupStudioScreenState extends State<CoverupStudioScreen>
 
     setState(() => _isSaving = true);
     try {
-      final bytes = await loadConceptImageBytes(imageUrl);
+      final saved = await saveConceptImage(bytes, filename: 'ink_coverup');
       if (!mounted) return;
-      if (bytes == null || bytes.isEmpty) {
-        _showNotice('Unable to download image. Please try again.');
-        return;
-      }
-
-      final result = await SharePlus.instance.share(
-        ShareParams(
-          files: [
-            XFile.fromData(
-              bytes,
-              name: 'coverup_preview.png',
-              mimeType: 'image/png',
-            ),
-          ],
-        ),
-      );
-
-      if (!mounted) return;
-      if (result.status != ShareResultStatus.unavailable) {
-        _showNotice('Image saved to your photos!');
+      if (saved) {
+        _showNotice("Saved to your phone's Photos");
+      } else {
+        _showNotice(
+          'Unable to save image. Allow Photos access and try again.',
+        );
       }
     } catch (_) {
       if (mounted) {
@@ -643,29 +640,33 @@ class _CoverupStudioScreenState extends State<CoverupStudioScreen>
                         clipBehavior: Clip.antiAlias,
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(12),
-                          child: Image.network(
-                            _resultImageUrl!,
-                            fit: BoxFit.cover,
-                            loadingBuilder: (context, child, loadingProgress) {
-                              if (loadingProgress == null) return child;
-                              return const Center(
-                                child: CupertinoActivityIndicator(
-                                    color: _gold),
-                              );
-                            },
-                            errorBuilder: (context, error, stackTrace) {
-                              return const Center(
-                                child: Icon(CupertinoIcons.photo,
-                                    color: _snippetGrey, size: 48),
-                              );
-                            },
-                          ),
+                          child: _resultImageBytes != null
+                              ? Image.memory(
+                                  _resultImageBytes!,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return const Center(
+                                      child: Icon(
+                                        CupertinoIcons.photo,
+                                        color: _snippetGrey,
+                                        size: 48,
+                                      ),
+                                    );
+                                  },
+                                )
+                              : const Center(
+                                  child: Icon(
+                                    CupertinoIcons.photo,
+                                    color: _snippetGrey,
+                                    size: 48,
+                                  ),
+                                ),
                         ),
                       ),
                     if (_revealMode == _RevealMode.slider)
                       _DragRevealWidget(
                         originalBytes: _selectedImageBytes!,
-                        resultUrl: _resultImageUrl!,
+                        resultBytes: _resultImageBytes,
                         sliderPosition: _sliderPosition,
                         onSliderChanged: (v) =>
                             setState(() => _sliderPosition = v),
@@ -673,7 +674,7 @@ class _CoverupStudioScreenState extends State<CoverupStudioScreen>
                     if (_revealMode == _RevealMode.shimmer)
                       _ShimmerRevealWidget(
                         originalBytes: _selectedImageBytes!,
-                        resultUrl: _resultImageUrl!,
+                        resultBytes: _resultImageBytes,
                         shimmerAnimation: _shimmerAnimation,
                         shimmerRunning: _shimmerRunning,
                         onToggle: _toggleShimmer,
@@ -850,13 +851,13 @@ class _ModeChip extends StatelessWidget {
 class _DragRevealWidget extends StatelessWidget {
   const _DragRevealWidget({
     required this.originalBytes,
-    required this.resultUrl,
+    required this.resultBytes,
     required this.sliderPosition,
     required this.onSliderChanged,
   });
 
   final Uint8List originalBytes;
-  final String resultUrl;
+  final Uint8List? resultBytes;
   final double sliderPosition;
   final ValueChanged<double> onSliderChanged;
 
@@ -864,6 +865,7 @@ class _DragRevealWidget extends StatelessWidget {
   static const Color _gold = Color(0xFFD4AF37);
   static const Color _surface = Color(0xFF1A1A1A);
   static const Color _border = Color(0xFF333333);
+  static const Color _snippetGrey = Color(0xFF999999);
 
   @override
   Widget build(BuildContext context) {
@@ -900,16 +902,27 @@ class _DragRevealWidget extends StatelessWidget {
                 Positioned.fill(
                   child: ClipRect(
                     clipper: _RightClipper(sliderPosition),
-                    child: Image.network(
-                      resultUrl,
-                      fit: BoxFit.cover,
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return const Center(
-                          child: CupertinoActivityIndicator(color: _gold),
-                        );
-                      },
-                    ),
+                    child: resultBytes != null
+                        ? Image.memory(
+                            resultBytes!,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return const Center(
+                                child: Icon(
+                                  CupertinoIcons.photo,
+                                  color: _snippetGrey,
+                                  size: 48,
+                                ),
+                              );
+                            },
+                          )
+                        : const Center(
+                            child: Icon(
+                              CupertinoIcons.photo,
+                              color: _snippetGrey,
+                              size: 48,
+                            ),
+                          ),
                   ),
                 ),
                 Positioned(
@@ -1012,14 +1025,14 @@ class _RightClipper extends CustomClipper<Rect> {
 class _ShimmerRevealWidget extends StatelessWidget {
   const _ShimmerRevealWidget({
     required this.originalBytes,
-    required this.resultUrl,
+    required this.resultBytes,
     required this.shimmerAnimation,
     required this.shimmerRunning,
     required this.onToggle,
   });
 
   final Uint8List originalBytes;
-  final String resultUrl;
+  final Uint8List? resultBytes;
   final Animation<double> shimmerAnimation;
   final bool shimmerRunning;
   final VoidCallback onToggle;
@@ -1028,6 +1041,7 @@ class _ShimmerRevealWidget extends StatelessWidget {
   static const Color _gold = Color(0xFFD4AF37);
   static const Color _surface = Color(0xFF1A1A1A);
   static const Color _border = Color(0xFF333333);
+  static const Color _snippetGrey = Color(0xFF999999);
 
   @override
   Widget build(BuildContext context) {
@@ -1057,16 +1071,27 @@ class _ShimmerRevealWidget extends StatelessWidget {
                   Positioned.fill(
                     child: Opacity(
                       opacity: resultOpacity,
-                      child: Image.network(
-                        resultUrl,
-                        fit: BoxFit.cover,
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return const Center(
-                            child: CupertinoActivityIndicator(color: _gold),
-                          );
-                        },
-                      ),
+                      child: resultBytes != null
+                          ? Image.memory(
+                              resultBytes!,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return const Center(
+                                  child: Icon(
+                                    CupertinoIcons.photo,
+                                    color: _snippetGrey,
+                                    size: 48,
+                                  ),
+                                );
+                              },
+                            )
+                          : const Center(
+                              child: Icon(
+                                CupertinoIcons.photo,
+                                color: _snippetGrey,
+                                size: 48,
+                              ),
+                            ),
                     ),
                   ),
                   if (shimmerRunning)
