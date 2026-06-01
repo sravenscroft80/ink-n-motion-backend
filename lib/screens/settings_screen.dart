@@ -11,6 +11,7 @@ import 'package:ink_n_motion/services/billing_service.dart';
 import 'package:ink_n_motion/services/firestore_wallet_service.dart';
 import 'package:ink_n_motion/state/app_state.dart';
 import 'package:ink_n_motion/state/providers.dart';
+import 'package:ink_n_motion/utils/app_links.dart';
 import 'package:ink_n_motion/utils/design_tokens.dart';
 import 'package:ink_n_motion/utils/navigation.dart';
 import 'package:ink_n_motion/widgets/settings/settings_section_header.dart';
@@ -129,7 +130,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Future<void> _shareApp() async {
     await SharePlus.instance.share(
       ShareParams(
-        text: 'Check out Ink-N-Motion — bring your tattoos to life! 🔥',
+        text: kShareMessage,
       ),
     );
   }
@@ -449,8 +450,6 @@ class _CreditsInfoCard extends StatelessWidget {
     '1 AI Concept Render = 1 token (1 free per day)',
     '10-Second Animation = 10 tokens (first one free lifetime)',
     'Coverup Studio Render = 3 tokens (first one free lifetime)',
-    'Referral reward: +10 tokens per friend who signs up',
-    'Social share reward: +5 tokens (one time)',
   ];
 
   @override

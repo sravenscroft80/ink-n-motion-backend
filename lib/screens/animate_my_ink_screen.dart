@@ -7,9 +7,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:ink_n_motion/services/firestore_wallet_service.dart';
+import 'package:ink_n_motion/utils/app_links.dart';
 import 'package:ink_n_motion/utils/gallery_media_saver.dart';
 import 'package:ink_n_motion/widgets/video/ink_network_video_player.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:ink_n_motion/screens/coverup_studio_picker.dart'
     if (dart.library.html) 'package:ink_n_motion/screens/coverup_studio_picker_web.dart'
     if (dart.library.io) 'package:ink_n_motion/screens/coverup_studio_picker_io.dart';
@@ -267,7 +268,7 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
 
       setState(() {
         _taskId = taskId;
-        _pollStatus = 'Queued — waiting for Kling...';
+        _pollStatus = 'Queued — preparing your animation...';
       });
 
       String? videoUrl;
@@ -313,7 +314,7 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
         }
 
         if (status == 'failed') {
-          throw Exception('Kling render failed');
+          throw Exception('Animation render failed');
         }
 
         setState(() {
@@ -327,7 +328,7 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
     } on TimeoutException {
       if (!mounted) return;
       setState(() {
-        _errorMessage = 'Request timed out submitting to Kling';
+        _errorMessage = 'Request timed out while starting your animation';
       });
     } on Exception catch (e) {
       if (!mounted) return;
@@ -393,10 +394,11 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
 
   Future<void> _shareVideo() async {
     if (_videoUrl == null) return;
-    final uri = Uri.parse(_videoUrl!);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    }
+    await SharePlus.instance.share(
+      ShareParams(
+        text: '${_videoUrl!}\n\n$kShareMessage',
+      ),
+    );
   }
 
   @override

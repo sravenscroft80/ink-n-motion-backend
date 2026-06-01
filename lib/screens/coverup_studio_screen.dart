@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:ink_n_motion/services/firestore_wallet_service.dart';
+import 'package:ink_n_motion/utils/app_links.dart';
 import 'package:ink_n_motion/utils/concept_image_loader.dart';
 import 'package:ink_n_motion/utils/save_concept_image.dart';
 import 'package:ink_n_motion/screens/coverup_studio_picker.dart'
@@ -317,7 +318,7 @@ class _CoverupStudioScreenState extends State<CoverupStudioScreen>
 
       await SharePlus.instance.share(
         ShareParams(
-          text: 'Check out my tattoo coverup concept from Ink·N·Motion!',
+          text: kShareMessage,
           files: [
             XFile.fromData(
               bytes,
