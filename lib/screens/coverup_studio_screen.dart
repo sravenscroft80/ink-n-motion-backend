@@ -582,6 +582,18 @@ class _CoverupStudioScreenState extends State<CoverupStudioScreen>
                     ],
                   ),
                   const SizedBox(height: 16),
+                  const Center(
+                    child: Text(
+                      'Tip: all-blackout tattoos or full sleeves may produce varied results.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: _snippetGrey,
+                        fontSize: 11,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
                   GestureDetector(
                     onTap: _isGenerating ? null : _generateCoverup,
                     child: Container(
@@ -620,6 +632,20 @@ class _CoverupStudioScreenState extends State<CoverupStudioScreen>
                       ),
                     ),
                   ),
+                  if (_isGenerating) ...[
+                    const SizedBox(height: 8),
+                    const Center(
+                      child: Text(
+                        'Results & times may vary — keep the app open, this can take a minute.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: _snippetGrey,
+                          fontSize: 11,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ),
+                  ],
                   if (_errorMessage != null) ...[
                     const SizedBox(height: 8),
                     Container(
