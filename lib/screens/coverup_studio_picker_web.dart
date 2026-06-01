@@ -76,3 +76,8 @@ Uint8List? _bytesFromReaderResult(Object? result) {
   }
   return null;
 }
+
+/// Web has no system camera capture — reuse file picker.
+Future<({Uint8List bytes, String name})?> captureCoverupImage() async {
+  return pickCoverupImage();
+}

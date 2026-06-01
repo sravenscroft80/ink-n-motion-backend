@@ -74,12 +74,46 @@ class _CoverupStudioScreenState extends State<CoverupStudioScreen>
   }
 
   Future<void> _pickImage() async {
-    final picked = await pickCoverupImage();
+    ({Uint8List bytes, String name})? picked;
+
+    if (kIsWeb) {
+      picked = await pickCoverupImage();
+    } else {
+      final choice = await showCupertinoModalPopup<String>(
+        context: context,
+        builder: (ctx) => CupertinoActionSheet(
+          title: const Text('Add Tattoo Photo'),
+          actions: [
+            CupertinoActionSheetAction(
+              onPressed: () => Navigator.of(ctx).pop('camera'),
+              child: const Text('Take Photo'),
+            ),
+            CupertinoActionSheetAction(
+              onPressed: () => Navigator.of(ctx).pop('gallery'),
+              child: const Text('Choose from Gallery'),
+            ),
+          ],
+          cancelButton: CupertinoActionSheetAction(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
+          ),
+        ),
+      );
+
+      if (!mounted) return;
+      if (choice == 'camera') {
+        picked = await captureCoverupImage();
+      } else if (choice == 'gallery') {
+        picked = await pickCoverupImage();
+      }
+    }
+
     if (!mounted || picked == null) return;
 
+    final result = picked;
     setState(() {
-      _selectedImageBytes = picked.bytes;
-      _selectedImageName = picked.name;
+      _selectedImageBytes = result.bytes;
+      _selectedImageName = result.name;
       _errorMessage = null;
     });
   }

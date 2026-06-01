@@ -4,8 +4,11 @@ import 'dart:typed_data';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:ink_n_motion/services/firestore_wallet_service.dart';
+import 'package:ink_n_motion/utils/gallery_media_saver.dart';
+import 'package:ink_n_motion/widgets/video/ink_network_video_player.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:ink_n_motion/screens/coverup_studio_picker.dart'
     if (dart.library.html) 'package:ink_n_motion/screens/coverup_studio_picker_web.dart'
@@ -25,6 +28,7 @@ class _InkStyle {
   final String emoji;
   final String hint;
   final bool isFree;
+  final String assetPath;
 
   const _InkStyle({
     required this.id,
@@ -32,6 +36,7 @@ class _InkStyle {
     required this.emoji,
     required this.hint,
     required this.isFree,
+    required this.assetPath,
   });
 }
 
@@ -45,7 +50,6 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
   static const Color _mutedGrey = Color(0xFF444444);
   static const Color _snippetGrey = Color(0xFF999999);
   static const Color _errorRed = Color(0xFFCC3333);
-  static const Color _pillDarkText = Color(0xFF0D0D0D);
 
   static const List<_InkStyle> _styles = [
     _InkStyle(
@@ -54,6 +58,7 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
       emoji: '🔥',
       hint: 'Warm golden light pulses through the linework',
       isFree: true,
+      assetPath: 'assets/images/animation_styles/ember_glow.png',
     ),
     _InkStyle(
       id: 'fluid_flow',
@@ -61,6 +66,7 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
       emoji: '🌊',
       hint: 'Ink ripples and breathes like liquid',
       isFree: true,
+      assetPath: 'assets/images/animation_styles/fluid_flow.png',
     ),
     _InkStyle(
       id: 'shadow_reaper',
@@ -68,6 +74,7 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
       emoji: '🌑',
       hint: 'Dark gothic forms emerge from deep shadows',
       isFree: true,
+      assetPath: 'assets/images/animation_styles/shadow_reaper.png',
     ),
     _InkStyle(
       id: 'electric_storm',
@@ -75,6 +82,7 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
       emoji: '⚡',
       hint: 'Neon electricity arcs between the linework',
       isFree: true,
+      assetPath: 'assets/images/animation_styles/electric_storm.png',
     ),
     _InkStyle(
       id: 'japanese_wave',
@@ -82,6 +90,7 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
       emoji: '🎴',
       hint: 'Ink flows like traditional brush strokes and waves',
       isFree: true,
+      assetPath: 'assets/images/animation_styles/japanese_wave.png',
     ),
     _InkStyle(
       id: 'alex_grey',
@@ -89,6 +98,7 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
       emoji: '🔮',
       hint: 'Sacred geometry and visionary light grids activate',
       isFree: true,
+      assetPath: 'assets/images/animation_styles/alex_grey.png',
     ),
     _InkStyle(
       id: 'steampunk',
@@ -96,6 +106,7 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
       emoji: '⚙️',
       hint: 'Gears turn, copper glows, steam rises from the ink',
       isFree: true,
+      assetPath: 'assets/images/animation_styles/steampunk.png',
     ),
     _InkStyle(
       id: 'horror',
@@ -103,6 +114,7 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
       emoji: '🩸',
       hint: 'Ink drips, veins pulse, darkness breathes',
       isFree: true,
+      assetPath: 'assets/images/animation_styles/horror.png',
     ),
     _InkStyle(
       id: 'watercolor_bloom',
@@ -110,6 +122,7 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
       emoji: '🎨',
       hint: 'Ink bleeds outward like pigment on wet paper',
       isFree: true,
+      assetPath: 'assets/images/animation_styles/watercolor_bloom.png',
     ),
     _InkStyle(
       id: 'mystic_drift',
@@ -117,6 +130,7 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
       emoji: '✨',
       hint: 'Elements drift with an ethereal smoke energy',
       isFree: true,
+      assetPath: 'assets/images/animation_styles/mystic_drift.png',
     ),
   ];
 
@@ -124,18 +138,53 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
   String? _selectedImageName;
   _InkStyle _selectedStyle = _styles[0];
   bool _isGenerating = false;
+  bool _isSaving = false;
   String? _taskId;
   String? _pollStatus;
   String? _videoUrl;
   String? _errorMessage;
 
   Future<void> _pickImage() async {
-    final picked = await pickCoverupImage();
+    ({Uint8List bytes, String name})? picked;
+
+    if (kIsWeb) {
+      picked = await pickCoverupImage();
+    } else {
+      final choice = await showCupertinoModalPopup<String>(
+        context: context,
+        builder: (ctx) => CupertinoActionSheet(
+          title: const Text('Add Tattoo Photo'),
+          actions: [
+            CupertinoActionSheetAction(
+              onPressed: () => Navigator.of(ctx).pop('camera'),
+              child: const Text('Take Photo'),
+            ),
+            CupertinoActionSheetAction(
+              onPressed: () => Navigator.of(ctx).pop('gallery'),
+              child: const Text('Choose from Gallery'),
+            ),
+          ],
+          cancelButton: CupertinoActionSheetAction(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
+          ),
+        ),
+      );
+
+      if (!mounted) return;
+      if (choice == 'camera') {
+        picked = await captureCoverupImage();
+      } else if (choice == 'gallery') {
+        picked = await pickCoverupImage();
+      }
+    }
+
     if (!mounted || picked == null) return;
 
+    final result = picked;
     setState(() {
-      _selectedImageBytes = picked.bytes;
-      _selectedImageName = picked.name;
+      _selectedImageBytes = result.bytes;
+      _selectedImageName = result.name;
       _errorMessage = null;
     });
   }
@@ -315,10 +364,30 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
   }
 
   Future<void> _saveVideo() async {
-    if (_videoUrl == null) return;
-    final uri = Uri.parse(_videoUrl!);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    final videoUrl = _videoUrl;
+    if (videoUrl == null || videoUrl.isEmpty) {
+      _showNotice('Nothing to save yet.');
+      return;
+    }
+
+    if (kIsWeb) {
+      _showNotice('Right-click the video link to save');
+      return;
+    }
+
+    setState(() => _isSaving = true);
+    try {
+      final saved = await saveNetworkVideoToGallery(videoUrl);
+      if (!mounted) return;
+      _showNotice(
+        saved
+            ? 'Video saved to your gallery!'
+            : 'Unable to save video. Please try again.',
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
     }
   }
 
@@ -501,56 +570,132 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
                               child: Opacity(
                                 opacity: style.isFree ? 1.0 : 0.65,
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 14,
-                                    vertical: 10,
-                                  ),
+                                  width: 96,
+                                  padding: const EdgeInsets.all(6),
                                   decoration: BoxDecoration(
                                     color: _selectedStyle.id == style.id
-                                        ? _gold
+                                        ? _gold.withValues(alpha: 0.15)
                                         : _surface,
-                                    borderRadius: BorderRadius.circular(20),
+                                    borderRadius: BorderRadius.circular(12),
                                     border: Border.all(
-                                      color: !style.isFree
-                                          ? const Color(0xFF4FC3F7)
-                                          : const Color(0x00000000),
-                                      width: 1.5,
+                                      color: _selectedStyle.id == style.id
+                                          ? _gold
+                                          : (!style.isFree
+                                              ? const Color(0xFF4FC3F7)
+                                              : _border),
+                                      width: _selectedStyle.id == style.id
+                                          ? 2
+                                          : 1.5,
                                     ),
                                   ),
-                                  child: Row(
+                                  child: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Text(
-                                        style.emoji,
-                                        style: const TextStyle(fontSize: 14),
-                                      ),
-                                      const SizedBox(width: 6),
-                                      Text(
-                                        style.label,
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          fontWeight:
-                                              _selectedStyle.id == style.id
-                                                  ? FontWeight.bold
-                                                  : FontWeight.normal,
-                                          color: _selectedStyle.id == style.id
-                                              ? _pillDarkText
-                                              : _snippetGrey,
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: _StylePreviewImage(
+                                          assetPath: style.assetPath,
+                                          emoji: style.emoji,
+                                          width: 84,
+                                          height: 52,
                                         ),
                                       ),
-                                      if (!style.isFree) ...[
-                                        const SizedBox(width: 6),
-                                        const Text(
-                                          '🔒',
-                                          style: TextStyle(fontSize: 11),
-                                        ),
-                                      ],
+                                      const SizedBox(height: 6),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            style.emoji,
+                                            style:
+                                                const TextStyle(fontSize: 11),
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Flexible(
+                                            child: Text(
+                                              style.label,
+                                              style: TextStyle(
+                                                fontSize: 11,
+                                                fontWeight:
+                                                    _selectedStyle.id ==
+                                                            style.id
+                                                        ? FontWeight.bold
+                                                        : FontWeight.normal,
+                                                color: _selectedStyle.id ==
+                                                        style.id
+                                                    ? CupertinoColors.white
+                                                    : _snippetGrey,
+                                              ),
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          ),
+                                          if (!style.isFree) ...[
+                                            const SizedBox(width: 2),
+                                            const Text(
+                                              '🔒',
+                                              style: TextStyle(fontSize: 9),
+                                            ),
+                                          ],
+                                        ],
+                                      ),
                                     ],
                                   ),
                                 ),
                               ),
                             ),
                           ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    width: double.infinity,
+                    height: 180,
+                    decoration: BoxDecoration(
+                      color: _background,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: _border),
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        const ColoredBox(color: _background),
+                        Positioned.fill(
+                          child: _StylePreviewImage(
+                            assetPath: _selectedStyle.assetPath,
+                            emoji: _selectedStyle.emoji,
+                            fit: BoxFit.contain,
+                            expand: true,
+                          ),
+                        ),
+                        Positioned(
+                          left: 8,
+                          bottom: 8,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: CupertinoColors.black.withValues(
+                                alpha: 0.55,
+                              ),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              '${_selectedStyle.emoji} ${_selectedStyle.label} — plain vs effect',
+                              style: const TextStyle(
+                                color: CupertinoColors.white,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -705,50 +850,19 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    GestureDetector(
-                      onTap: _saveVideo,
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
                       child: Container(
                         height: 300,
                         decoration: BoxDecoration(
                           color: _surface,
-                          borderRadius: BorderRadius.circular(12),
                           border: Border.all(color: _border),
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(
-                                CupertinoIcons.play_circle_fill,
-                                color: _gold,
-                                size: 64,
-                              ),
-                              const SizedBox(height: 12),
-                              const Text(
-                                'Video Ready!',
-                                style: TextStyle(
-                                  color: CupertinoColors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 16),
-                                child: Text(
-                                  _videoUrl!,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    color: _snippetGrey,
-                                    fontSize: 11,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
+                        clipBehavior: Clip.antiAlias,
+                        child: InkNetworkVideoPlayer(
+                          url: _videoUrl!,
+                          autoPlay: true,
                         ),
                       ),
                     ),
@@ -761,7 +875,7 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
                           icon: CupertinoIcons.arrow_down_circle,
                           backgroundColor: _surface,
                           foregroundColor: CupertinoColors.white,
-                          onTap: _saveVideo,
+                          onTap: _isSaving ? null : _saveVideo,
                         ),
                         _ActionButton(
                           label: 'Share',
@@ -799,6 +913,55 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
         ],
       ),
     );
+  }
+}
+
+/// Local animation-style preview with emoji fallback when asset is missing.
+class _StylePreviewImage extends StatelessWidget {
+  const _StylePreviewImage({
+    required this.assetPath,
+    required this.emoji,
+    this.width,
+    this.height,
+    this.fit = BoxFit.cover,
+    this.expand = false,
+  });
+
+  final String assetPath;
+  final String emoji;
+  final double? width;
+  final double? height;
+  final BoxFit fit;
+  final bool expand;
+
+  static const Color _surface = Color(0xFF1A1A1A);
+
+  @override
+  Widget build(BuildContext context) {
+    final image = Image.asset(
+      assetPath,
+      width: expand ? null : width,
+      height: expand ? null : height,
+      fit: fit,
+      errorBuilder: (context, error, stackTrace) {
+        return Container(
+          width: width,
+          height: height,
+          color: _surface,
+          alignment: Alignment.center,
+          child: Text(
+            emoji,
+            style: TextStyle(
+              fontSize: height != null ? (height! * 0.35).clamp(18, 40) : 28,
+            ),
+          ),
+        );
+      },
+    );
+    if (expand) {
+      return SizedBox.expand(child: image);
+    }
+    return image;
   }
 }
 
