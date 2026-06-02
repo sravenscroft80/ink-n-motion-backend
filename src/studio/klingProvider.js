@@ -91,8 +91,10 @@ async function submitKlingJob({ imageUrl, durationSeconds = 5, stylePrompt = '' 
     image,
     prompt: stylePrompt || 'cinematic tattoo animation, flowing ink movement',
     duration: String(durationSeconds),
-    cfg_scale: 0.7,
-    mode: 'std',
+    cfg_scale: 0.5,
+    mode: 'pro',
+    negative_prompt:
+      'body movement, skin movement, distorted linework, warped tattoo, melting lines, detached ink, extra limbs, deformed anatomy, background motion, camera movement, blurry, low quality',
   };
 
   logger.info('Submitting Kling i2v job', {
