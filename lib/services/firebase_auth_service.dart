@@ -211,8 +211,18 @@ class FirebaseAuthService {
   ) async {
     final current = auth.currentUser;
     if (current != null && current.isAnonymous) {
-      final linked = await current.linkWithCredential(credential);
-      return linked.user;
+      try {
+        final linked = await current.linkWithCredential(credential);
+        return linked.user;
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'credential-already-in-use' ||
+            e.code == 'email-already-in-use') {
+          // Credential belongs to an existing account — sign into it instead.
+          final signedIn = await auth.signInWithCredential(credential);
+          return signedIn.user;
+        }
+        rethrow;
+      }
     }
     final signedIn = await auth.signInWithCredential(credential);
     return signedIn.user;

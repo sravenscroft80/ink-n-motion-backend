@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -369,74 +371,206 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 }
 
-class _AccountProfileHeader extends StatelessWidget {
+class _AccountProfileHeader extends ConsumerStatefulWidget {
   const _AccountProfileHeader({required this.gold});
 
   final Color gold;
 
   @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        showCupertinoDialog<void>(
-          context: context,
-          builder: (ctx) => CupertinoAlertDialog(
-            title: const Text('Sign In'),
-            content: const Text(
-              'Account sign-in coming soon. Your data is saved locally for now.',
-            ),
-            actions: [
-              CupertinoDialogAction(
-                isDefaultAction: true,
-                onPressed: () => Navigator.of(ctx).pop(),
-                child: const Text('OK'),
-              ),
-            ],
+  ConsumerState<_AccountProfileHeader> createState() =>
+      _AccountProfileHeaderState();
+}
+
+class _AccountProfileHeaderState extends ConsumerState<_AccountProfileHeader> {
+  bool _isSigningIn = false;
+
+  Future<void> _handleGoogleSignIn() async {
+    if (_isSigningIn) return;
+    setState(() => _isSigningIn = true);
+    try {
+      final authService = ref.read(firebaseAuthServiceProvider);
+      await authService.signInWithGoogle();
+    } catch (_) {
+      if (!mounted) return;
+      showCupertinoDialog<void>(
+        context: context,
+        builder: (ctx) => CupertinoAlertDialog(
+          title: const Text('Sign In Failed'),
+          content: const Text(
+            'Unable to sign in with Google. Please try again.',
           ),
-        );
-      },
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: InkSpacing.sm),
-        child: Row(
-          children: [
-            Container(
-              width: 56,
-              height: 56,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: gold, width: 2),
-                color: InkColors.backgroundElevated,
-              ),
-              child: Icon(
-                CupertinoIcons.person_fill,
-                color: gold,
-                size: 28,
-              ),
-            ),
-            const SizedBox(width: InkSpacing.md),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Ink Master',
-                    style: InkTypography.headline.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const SizedBox(height: InkSpacing.xs),
-                  Text(
-                    'Tap to sign in',
-                    style: InkTypography.subhead.copyWith(
-                      color: InkColors.textSecondary,
-                    ),
-                  ),
-                ],
-              ),
+          actions: [
+            CupertinoDialogAction(
+              isDefaultAction: true,
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text('OK'),
             ),
           ],
         ),
+      );
+    } finally {
+      if (mounted) setState(() => _isSigningIn = false);
+    }
+  }
+
+  void _showSignOutSheet() {
+    showCupertinoModalPopup<void>(
+      context: context,
+      builder: (ctx) => CupertinoActionSheet(
+        actions: [
+          CupertinoActionSheetAction(
+            isDestructiveAction: true,
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              unawaited(_confirmSignOut());
+            },
+            child: const Text('Sign Out'),
+          ),
+        ],
+        cancelButton: CupertinoActionSheetAction(
+          onPressed: () => Navigator.of(ctx).pop(),
+          child: const Text('Cancel'),
+        ),
       ),
+    );
+  }
+
+  Future<void> _confirmSignOut() async {
+    final confirmed = await showCupertinoDialog<bool>(
+      context: context,
+      builder: (ctx) => CupertinoAlertDialog(
+        title: const Text('Sign Out'),
+        content: const Text('Are you sure you want to sign out?'),
+        actions: [
+          CupertinoDialogAction(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          CupertinoDialogAction(
+            isDestructiveAction: true,
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Sign Out'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !mounted) return;
+
+    try {
+      await ref.read(firebaseAuthServiceProvider).signOut();
+    } catch (_) {
+      if (!mounted) return;
+      showCupertinoDialog<void>(
+        context: context,
+        builder: (ctx) => CupertinoAlertDialog(
+          title: const Text('Sign Out Failed'),
+          content: const Text('Unable to sign out. Please try again.'),
+          actions: [
+            CupertinoDialogAction(
+              isDefaultAction: true,
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  Widget _buildAvatar(User? user) {
+    final photoUrl = user?.photoURL;
+    final hasPhoto = photoUrl != null && photoUrl.isNotEmpty;
+
+    return Container(
+      width: 56,
+      height: 56,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: widget.gold, width: 2),
+        color: InkColors.backgroundElevated,
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: hasPhoto
+          ? Image.network(
+              photoUrl,
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => Icon(
+                CupertinoIcons.person_fill,
+                color: widget.gold,
+                size: 28,
+              ),
+            )
+          : Icon(
+              CupertinoIcons.person_fill,
+              color: widget.gold,
+              size: 28,
+            ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final authService = ref.watch(firebaseAuthServiceProvider);
+
+    return StreamBuilder<User?>(
+      stream: authService.authStateChanges(),
+      builder: (context, snapshot) {
+        final user = snapshot.data ?? authService.currentUser;
+        final signedIn = user != null && !user.isAnonymous;
+
+        final name = user?.displayName?.trim();
+        final email = user?.email?.trim();
+        final hasName = name != null && name.isNotEmpty;
+
+        final primaryText = signedIn
+            ? (hasName ? name : (email ?? 'Signed in'))
+            : 'Sign in';
+        final secondaryText = signedIn
+            ? (hasName && email != null && email.isNotEmpty
+                ? email
+                : 'Signed in')
+            : 'Tap to sign in with Google';
+
+        return GestureDetector(
+          onTap: _isSigningIn
+              ? null
+              : signedIn
+                  ? _showSignOutSheet
+                  : () => unawaited(_handleGoogleSignIn()),
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: InkSpacing.sm),
+            child: Row(
+              children: [
+                _buildAvatar(signedIn ? user : null),
+                const SizedBox(width: InkSpacing.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        primaryText,
+                        style: InkTypography.headline.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: InkSpacing.xs),
+                      Text(
+                        secondaryText,
+                        style: InkTypography.subhead.copyWith(
+                          color: InkColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (_isSigningIn)
+                  const CupertinoActivityIndicator(radius: 10),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
