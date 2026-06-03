@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ink_n_motion/data/style_template_catalog.dart';
 import 'package:ink_n_motion/models/generate_video_response.dart';
+import 'package:ink_n_motion/models/purchase_result.dart';
 import 'package:ink_n_motion/models/style_template.dart';
 import 'package:ink_n_motion/models/transaction_results.dart';
 import 'package:ink_n_motion/models/video_generation_status.dart';
@@ -148,20 +149,27 @@ class AppStateNotifier extends StateNotifier<AppState> {
   }
 
   /// Shared helper for all consumable (non-subscription) pack purchases.
-  Future<bool> _purchasePack(String productId) async {
+  Future<PurchaseResult> _purchasePack(String productId) async {
     try {
-      final customerInfo = await BillingService.purchaseProduct(
+      final storeResult = await BillingService.purchaseProduct(
         productId,
         isSubscription: false,
       );
-      if (customerInfo == null) return false;
+      if (!storeResult.isSuccess) {
+        return storeResult;
+      }
+
+      final customerInfo = storeResult.customerInfo;
+      if (customerInfo == null) {
+        return PurchaseResult.error('Purchase completed without customer info.');
+      }
 
       final uid = _userService.getCurrentUid();
       if (uid == null) {
         debugPrint(
           'AppStateNotifier._purchasePack($productId): no uid — cannot credit Firestore wallet',
         );
-        return false;
+        return PurchaseResult.creditFailed();
       }
 
       final tokens = BillingProductIds.tokensForProduct(productId);
@@ -169,7 +177,7 @@ class AppStateNotifier extends StateNotifier<AppState> {
         debugPrint(
           'AppStateNotifier._purchasePack($productId): invalid token grant ($tokens)',
         );
-        return false;
+        return PurchaseResult.error('Invalid token grant for $productId.');
       }
 
       try {
@@ -181,54 +189,109 @@ class AppStateNotifier extends StateNotifier<AppState> {
           error,
           stackTrace,
         );
-        return false;
+        return PurchaseResult.creditFailed();
       }
 
       await InkHaptics.purchaseSuccess();
-      return true;
+      return PurchaseResult.fromStoreSuccess(customerInfo);
     } catch (error, stackTrace) {
       _logPurchaseFailure('_purchasePack($productId)', error, stackTrace);
-      return false;
+      return PurchaseResult.error('$error');
     }
   }
 
   /// Shared helper for all subscription purchases.
-  Future<bool> _purchaseSubscription(String productId) async {
+  Future<PurchaseResult> _purchaseSubscription(String productId) async {
     try {
-      final customerInfo = await BillingService.purchaseProduct(
+      final storeResult = await BillingService.purchaseProduct(
         productId,
         isSubscription: true,
       );
-      if (customerInfo == null) return false;
+      if (!storeResult.isSuccess) {
+        return storeResult;
+      }
+
+      final customerInfo = storeResult.customerInfo;
+      if (customerInfo == null) {
+        return PurchaseResult.error('Purchase completed without customer info.');
+      }
+
+      final uid = _userService.getCurrentUid();
+      if (uid == null) {
+        debugPrint(
+          'AppStateNotifier._purchaseSubscription($productId): no uid — cannot credit Firestore wallet',
+        );
+        return PurchaseResult.creditFailed();
+      }
+
+      final tokens = BillingProductIds.tokensForProduct(productId);
+      if (tokens <= 0) {
+        debugPrint(
+          'AppStateNotifier._purchaseSubscription($productId): invalid token grant ($tokens)',
+        );
+        return PurchaseResult.error('Invalid token grant for $productId.');
+      }
+
+      final tier = BillingProductIds.tierForProduct(productId);
+      if (tier == null) {
+        debugPrint(
+          'AppStateNotifier._purchaseSubscription($productId): unknown subscription tier',
+        );
+        return PurchaseResult.error('Unknown subscription tier for $productId.');
+      }
+
+      try {
+        await FirestoreWalletService.instance.initializeWallet(uid);
+        final entitlement =
+            customerInfo.entitlements.all[BillingEntitlements.inkMotionPro];
+        await FirestoreWalletService.instance.handleSubscriptionRenewal(
+          uid,
+          tier: tier,
+          renewalDate: _parseEntitlementExpiration(entitlement?.expirationDate),
+        );
+      } catch (error, stackTrace) {
+        _logPurchaseFailure(
+          '_purchaseSubscription($productId) firestore credit',
+          error,
+          stackTrace,
+        );
+        return PurchaseResult.creditFailed();
+      }
+
       await syncPremiumFromRevenueCat();
       await InkHaptics.purchaseSuccess();
-      return true;
+      return PurchaseResult.fromStoreSuccess(customerInfo);
     } catch (error, stackTrace) {
       _logPurchaseFailure(
         '_purchaseSubscription($productId)',
         error,
         stackTrace,
       );
-      return false;
+      return PurchaseResult.error('$error');
     }
   }
 
-  Future<bool> purchaseIntroPack() =>
+  DateTime? _parseEntitlementExpiration(String? expirationDate) {
+    if (expirationDate == null || expirationDate.isEmpty) return null;
+    return DateTime.tryParse(expirationDate);
+  }
+
+  Future<PurchaseResult> purchaseIntroPack() =>
       _purchasePack(BillingProductIds.introPack);
 
-  Future<bool> purchaseCreatorPack() =>
+  Future<PurchaseResult> purchaseCreatorPack() =>
       _purchasePack(BillingProductIds.creatorPack);
 
-  Future<bool> purchaseStudioPack() =>
+  Future<PurchaseResult> purchaseStudioPack() =>
       _purchasePack(BillingProductIds.studioPack);
 
-  Future<bool> purchaseSparkMonthly() =>
+  Future<PurchaseResult> purchaseSparkMonthly() =>
       _purchaseSubscription(BillingProductIds.sparkMonthly);
 
-  Future<bool> purchaseFlowMonthly() =>
+  Future<PurchaseResult> purchaseFlowMonthly() =>
       _purchaseSubscription(BillingProductIds.flowMonthly);
 
-  Future<bool> purchaseStudioMonthly() =>
+  Future<PurchaseResult> purchaseStudioMonthly() =>
       _purchaseSubscription(BillingProductIds.studioMonthly);
 
   /// Grants share-to-unlock bonus credits once per calendar day.

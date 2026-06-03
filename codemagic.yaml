@@ -16,6 +16,23 @@ workflows:
       - name: Inject GoogleService-Info.plist
         script: |
           echo $IOS_FIREBASE_CONFIG | base64 --decode > $CM_BUILD_DIR/ios/Runner/GoogleService-Info.plist
+      - name: Inject config/app.env
+        script: |
+          mkdir -p $CM_BUILD_DIR/config
+          if [ -n "$APP_ENV_CONFIG" ]; then
+            echo "$APP_ENV_CONFIG" | base64 --decode > $CM_BUILD_DIR/config/app.env
+          else
+            cat <<EOF > $CM_BUILD_DIR/config/app.env
+          REVENUECAT_ANDROID_API_KEY=${REVENUECAT_ANDROID_API_KEY}
+          REVENUECAT_IOS_API_KEY=${REVENUECAT_IOS_API_KEY}
+          RENDER_API_URL=${RENDER_API_URL:-https://ink-n-motion-api.onrender.com}
+          EOF
+          fi
+          if ! grep -qE '^REVENUECAT_IOS_API_KEY=.+$' "$CM_BUILD_DIR/config/app.env"; then
+            echo "ERROR: REVENUECAT_IOS_API_KEY missing in config/app.env"
+            echo "Set APP_ENV_CONFIG (base64 of config/app.env) or REVENUECAT_IOS_API_KEY in Codemagic."
+            exit 1
+          fi
       - name: Get Flutter packages
         script: flutter packages pub get
       - name: Flutter analyze
@@ -30,7 +47,7 @@ workflows:
 
       - name: Build iOS IPA
         script: |
-          flutter build ipa --release
+          flutter build ipa --release --dart-define-from-file=config/app.env
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
@@ -52,6 +69,23 @@ workflows:
       - name: Inject google-services.json
         script: |
           echo $ANDROID_FIREBASE_CONFIG | base64 --decode > $CM_BUILD_DIR/android/app/google-services.json
+      - name: Inject config/app.env
+        script: |
+          mkdir -p $CM_BUILD_DIR/config
+          if [ -n "$APP_ENV_CONFIG" ]; then
+            echo "$APP_ENV_CONFIG" | base64 --decode > $CM_BUILD_DIR/config/app.env
+          else
+            cat <<EOF > $CM_BUILD_DIR/config/app.env
+          REVENUECAT_ANDROID_API_KEY=${REVENUECAT_ANDROID_API_KEY}
+          REVENUECAT_IOS_API_KEY=${REVENUECAT_IOS_API_KEY}
+          RENDER_API_URL=${RENDER_API_URL:-https://ink-n-motion-api.onrender.com}
+          EOF
+          fi
+          if ! grep -qE '^REVENUECAT_ANDROID_API_KEY=.+$' "$CM_BUILD_DIR/config/app.env"; then
+            echo "ERROR: REVENUECAT_ANDROID_API_KEY missing in config/app.env"
+            echo "Set APP_ENV_CONFIG (base64 of config/app.env) or REVENUECAT_ANDROID_API_KEY in Codemagic."
+            exit 1
+          fi
       - name: Set up Android keystore
         script: |
           echo $ANDROID_KEYSTORE | base64 --decode > $CM_BUILD_DIR/android/app/upload-keystore.jks
@@ -67,6 +101,6 @@ workflows:
         script: flutter analyze
       - name: Build Android App Bundle
         script: |
-          flutter build appbundle --release
+          flutter build appbundle --release --dart-define-from-file=config/app.env
     artifacts:
       - build/app/outputs/bundle/release/*.aab

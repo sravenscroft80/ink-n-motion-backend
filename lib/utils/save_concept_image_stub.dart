@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
-Future<void> saveConceptImageImpl(
+Future<bool> saveConceptImageImpl(
   Uint8List bytes, {
   String filename = 'ink_concept.png',
-}) async {}
+}) async =>
+    false;

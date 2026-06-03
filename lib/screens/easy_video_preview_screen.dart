@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ink_n_motion/data/style_template_catalog.dart';
 import 'package:ink_n_motion/models/video_generation_status.dart';
@@ -82,12 +83,22 @@ class _EasyVideoPreviewScreenState extends ConsumerState<EasyVideoPreviewScreen>
     if (mounted) setState(() => _processing = false);
   }
 
-  void _saveToGallery() {
-    final saved = ref.read(appStateProvider.notifier).saveCurrentVideoToGallery();
+  Future<void> _saveToGallery() async {
+    if (kIsWeb) {
+      setState(() {
+        _saveFeedback = 'Right-click the video to save';
+      });
+      return;
+    }
+
+    setState(() => _saveFeedback = 'Saving...');
+    final saved =
+        await ref.read(appStateProvider.notifier).saveCurrentVideoToGallery();
+    if (!mounted) return;
     setState(() {
       _saveFeedback = saved
-          ? 'Saved to gallery footprint.'
-          : 'Nothing to save yet.';
+          ? 'Saved to your gallery!'
+          : 'Unable to save video. Please try again.';
     });
   }
 

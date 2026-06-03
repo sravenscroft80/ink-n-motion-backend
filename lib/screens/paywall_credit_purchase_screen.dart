@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ink_n_motion/models/paywall_tier.dart';
+import 'package:ink_n_motion/models/purchase_result.dart';
 import 'package:ink_n_motion/services/billing_service.dart';
 import 'package:ink_n_motion/services/firestore_wallet_service.dart';
 import 'package:ink_n_motion/state/providers.dart';
@@ -29,32 +32,97 @@ class _PaywallCreditPurchaseScreenState
     return FirestoreWalletService.instance.watchWallet(uid);
   }
 
+  Future<void> _showPurchaseAlert({
+    required String title,
+    required String message,
+  }) async {
+    await showCupertinoDialog<void>(
+      context: context,
+      builder: (ctx) => CupertinoAlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _handlePurchaseResult(PurchaseResult result) {
+    switch (result.outcome) {
+      case PurchaseOutcome.success:
+        Navigator.of(context).pop();
+      case PurchaseOutcome.cancelled:
+        return;
+      case PurchaseOutcome.notConfigured:
+        unawaited(
+          _showPurchaseAlert(
+            title: 'Purchases Unavailable',
+            message:
+                'In-app purchases are not available in this build. '
+                'Please reinstall from the store or contact '
+                'support@ink-n-motion.com.',
+          ),
+        );
+      case PurchaseOutcome.productNotFound:
+        unawaited(
+          _showPurchaseAlert(
+            title: 'Product Unavailable',
+            message:
+                'This item is not available in the store yet. '
+                'Try again later or contact support@ink-n-motion.com.',
+          ),
+        );
+      case PurchaseOutcome.creditFailed:
+        unawaited(
+          _showPurchaseAlert(
+            title: 'Tokens Not Added',
+            message:
+                'Your payment may have gone through, but we could not add '
+                'tokens to your account. Contact support@ink-n-motion.com '
+                'with your receipt and we will fix it.',
+          ),
+        );
+      case PurchaseOutcome.error:
+        unawaited(
+          _showPurchaseAlert(
+            title: 'Purchase Failed',
+            message: result.message?.isNotEmpty == true
+                ? result.message!
+                : 'Something went wrong. Please try again.',
+          ),
+        );
+    }
+  }
+
   Future<void> _completePurchase(PaywallTier tier) async {
     setState(() => _processingTierId = tier.id);
 
     final notifier = ref.read(appStateProvider.notifier);
-    final bool success;
+    final PurchaseResult result;
     switch (tier.id) {
       case PaywallTierId.introPack:
-        success = await notifier.purchaseIntroPack();
+        result = await notifier.purchaseIntroPack();
       case PaywallTierId.creatorPack:
-        success = await notifier.purchaseCreatorPack();
+        result = await notifier.purchaseCreatorPack();
       case PaywallTierId.studioPack:
-        success = await notifier.purchaseStudioPack();
+        result = await notifier.purchaseStudioPack();
       case PaywallTierId.sparkMonthly:
-        success = await notifier.purchaseSparkMonthly();
+        result = await notifier.purchaseSparkMonthly();
       case PaywallTierId.flowMonthly:
-        success = await notifier.purchaseFlowMonthly();
+        result = await notifier.purchaseFlowMonthly();
       case PaywallTierId.studioMonthly:
-        success = await notifier.purchaseStudioMonthly();
+        result = await notifier.purchaseStudioMonthly();
     }
 
     if (!mounted) return;
     setState(() => _processingTierId = null);
 
-    if (success) {
-      Navigator.of(context).pop();
-    }
+    _handlePurchaseResult(result);
   }
 
   @override

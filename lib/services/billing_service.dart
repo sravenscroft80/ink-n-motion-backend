@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:ink_n_motion/config/app_config.dart';
 import 'package:ink_n_motion/models/entitlement_status.dart';
+import 'package:ink_n_motion/models/purchase_result.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 /// Production RevenueCat product identifiers (App Store / Google Play).
@@ -192,14 +193,14 @@ abstract final class BillingService {
   }
 
   /// Fetches [productId] from the store and completes a RevenueCat purchase.
-  static Future<CustomerInfo?> purchaseProduct(
+  static Future<PurchaseResult> purchaseProduct(
     String productId, {
     required bool isSubscription,
   }) async {
     if (!_isConfigured) {
       debugPrint(
           'BillingService: SDK not configured — skipping purchase for $productId');
-      return null;
+      return PurchaseResult.notConfigured();
     }
 
     try {
@@ -212,27 +213,27 @@ abstract final class BillingService {
 
       if (products.isEmpty) {
         debugPrint('BillingService: product not found — $productId');
-        return null;
+        return PurchaseResult.productNotFound();
       }
 
       final customerInfo =
           await Purchases.purchaseStoreProduct(products.first);
-      return customerInfo;
+      return PurchaseResult.fromStoreSuccess(customerInfo);
     } on PlatformException catch (error) {
       final errorCode = PurchasesErrorHelper.getErrorCode(error);
       if (errorCode == PurchasesErrorCode.purchaseCancelledError) {
         debugPrint('BillingService: purchase cancelled for $productId');
-      } else {
-        debugPrint(
-          'BillingService: purchase failed for $productId — '
-          '${error.code}: ${error.message}',
-        );
+        return PurchaseResult.cancelled();
       }
-      return null;
+      debugPrint(
+        'BillingService: purchase failed for $productId — '
+        '${error.code}: ${error.message}',
+      );
+      return PurchaseResult.error(error.message);
     } catch (error, stackTrace) {
       debugPrint('BillingService: unexpected purchase error — $error');
       debugPrint('$stackTrace');
-      return null;
+      return PurchaseResult.error('$error');
     }
   }
 }
