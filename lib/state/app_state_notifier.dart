@@ -10,10 +10,12 @@ import 'package:ink_n_motion/models/transaction_results.dart';
 import 'package:ink_n_motion/models/video_generation_status.dart';
 import 'package:ink_n_motion/services/api_service.dart';
 import 'package:ink_n_motion/services/billing_service.dart';
+import 'package:ink_n_motion/services/firestore_wallet_service.dart';
 import 'package:ink_n_motion/services/storage_service.dart';
 import 'package:ink_n_motion/services/user_service.dart';
 import 'package:ink_n_motion/state/app_state.dart';
 import 'package:ink_n_motion/utils/exceptions.dart';
+import 'package:ink_n_motion/utils/gallery_media_saver.dart';
 import 'package:ink_n_motion/utils/ink_haptics.dart';
 class AppStateNotifier extends StateNotifier<AppState> {
   AppStateNotifier(this._storage, this._userService, this._api)
@@ -153,7 +155,35 @@ class AppStateNotifier extends StateNotifier<AppState> {
         isSubscription: false,
       );
       if (customerInfo == null) return false;
-      addCredits(BillingProductIds.tokensForProduct(productId));
+
+      final uid = _userService.getCurrentUid();
+      if (uid == null) {
+        debugPrint(
+          'AppStateNotifier._purchasePack($productId): no uid — cannot credit Firestore wallet',
+        );
+        return false;
+      }
+
+      final tokens = BillingProductIds.tokensForProduct(productId);
+      if (tokens <= 0) {
+        debugPrint(
+          'AppStateNotifier._purchasePack($productId): invalid token grant ($tokens)',
+        );
+        return false;
+      }
+
+      try {
+        await FirestoreWalletService.instance.initializeWallet(uid);
+        await FirestoreWalletService.instance.addPurchasedTokens(uid, tokens);
+      } catch (error, stackTrace) {
+        _logPurchaseFailure(
+          '_purchasePack($productId) firestore credit',
+          error,
+          stackTrace,
+        );
+        return false;
+      }
+
       await InkHaptics.purchaseSuccess();
       return true;
     } catch (error, stackTrace) {
@@ -627,18 +657,31 @@ class AppStateNotifier extends StateNotifier<AppState> {
       clearLocalOverlay: true,
     );
   }
-  bool saveCurrentVideoToGallery() {
+  Future<bool> saveCurrentVideoToGallery() async {
     final path = state.isLocalOverlay
         ? (state.sparkleMaskUrl ?? state.selectedImagePath)
         : state.dynamicOutputVideoPath;
     if (path == null || path.isEmpty) return false;
+
+    if (kIsWeb) return false;
+
     if (state.generatedVideoPaths.contains(path)) return true;
-    _commit(
-      state.copyWith(
-        generatedVideoPaths: [...state.generatedVideoPaths, path],
-      ),
-    );
-    return true;
+
+    final saved = looksLikeVideoUrl(path)
+        ? await saveNetworkVideoToGallery(path)
+        : await saveNetworkImageToGallery(
+            path,
+            filename: 'ink_motion_preview.png',
+          );
+
+    if (saved) {
+      _commit(
+        state.copyWith(
+          generatedVideoPaths: [...state.generatedVideoPaths, path],
+        ),
+      );
+    }
+    return saved;
   }
   StyleTemplate? get selectedStyleTemplate =>
       StyleTemplateCatalog.findById(state.selectedStyleTemplateId);

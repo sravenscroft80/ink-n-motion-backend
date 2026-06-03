@@ -821,7 +821,7 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
                     const SizedBox(height: 8),
                     const Center(
                       child: Text(
-                        'Results & times may vary — keep the app open, this can take a minute.',
+                        '✦ Quality renders take time — great ink is worth the wait.\nKeep the app open while we bring your tattoo to life.',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: _snippetGrey,

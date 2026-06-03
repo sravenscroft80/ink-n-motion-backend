@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ink_n_motion/models/paywall_tier.dart';
 import 'package:ink_n_motion/services/billing_service.dart';
+import 'package:ink_n_motion/services/firestore_wallet_service.dart';
 import 'package:ink_n_motion/state/providers.dart';
 import 'package:ink_n_motion/utils/design_tokens.dart';
 import 'package:ink_n_motion/widgets/ink_frosted_glass.dart';
@@ -20,6 +22,12 @@ class _PaywallCreditPurchaseScreenState
     extends ConsumerState<PaywallCreditPurchaseScreen> {
   PaywallTierId? _selectedTierId;
   PaywallTierId? _processingTierId;
+
+  Stream<InkWallet?> get _walletStream {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return const Stream.empty();
+    return FirestoreWalletService.instance.watchWallet(uid);
+  }
 
   Future<void> _completePurchase(PaywallTier tier) async {
     setState(() => _processingTierId = tier.id);
@@ -90,9 +98,16 @@ class _PaywallCreditPurchaseScreenState
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                '${appState.creditsBalance} tokens',
-                                style: InkTypography.title3,
+                              StreamBuilder<InkWallet?>(
+                                stream: _walletStream,
+                                builder: (context, snapshot) {
+                                  final balance =
+                                      snapshot.data?.totalBalance ?? 0;
+                                  return Text(
+                                    '$balance tokens',
+                                    style: InkTypography.title3,
+                                  );
+                                },
                               ),
                               Text(
                                 appState.isPremiumSubscriber
