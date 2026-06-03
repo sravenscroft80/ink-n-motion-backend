@@ -2,7 +2,7 @@ name: ink_n_motion
 description: "A new Flutter project."
 publish_to: 'none'
 
-version: 1.0.0+2
+version: 1.0.0+3
 
 environment:
   sdk: ^3.11.1
@@ -68,6 +68,7 @@ flutter:
     - assets/images/styles/neo_traditional_tattoo_hero.png
     - assets/images/styles/tebori_tattoo_hero.png
     - assets/images/styles/hand_poked_folk_tattoo_hero.png
+    - assets/images/animation_styles/
     - assets/images/workflow/workflow_step_00_prepare.png
     - assets/images/workflow/workflow_step_01_capture.png
     - assets/images/workflow/workflow_step_02_select.png
