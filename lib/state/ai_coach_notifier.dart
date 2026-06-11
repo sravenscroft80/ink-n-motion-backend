@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:ui' as ui;
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -361,7 +362,9 @@ class AiCoachNotifier extends StateNotifier<AiCoachState> {
     }
   }
 
-  Future<void> shareBlueprint() async {
+  /// [sharePositionOrigin] should be passed from the calling widget
+  /// (see shareOriginFromContext); falls back to the view size on iPad.
+  Future<void> shareBlueprint({ui.Rect? sharePositionOrigin}) async {
     final text = state.buildShareText();
 
     try {
@@ -378,6 +381,7 @@ class AiCoachNotifier extends StateNotifier<AiCoachState> {
           text: text,
           subject: 'My Ink-N-Motion Tattoo Blueprint',
           files: files,
+          sharePositionOrigin: sharePositionOrigin ?? _fallbackShareOrigin(),
         ),
       );
 
@@ -385,12 +389,23 @@ class AiCoachNotifier extends StateNotifier<AiCoachState> {
       state = state.copyWith(
         feedbackMessage: 'Blueprint shared.',
       );
-    } catch (_) {
+    } catch (error, stackTrace) {
+      debugPrint('AiCoachNotifier.shareBlueprint failed: $error');
+      debugPrint('$stackTrace');
       if (!mounted) return;
       state = state.copyWith(
         feedbackMessage: 'Unable to open share sheet. Try Save Blueprint.',
       );
     }
+  }
+
+  static ui.Rect _fallbackShareOrigin() {
+    final view = ui.PlatformDispatcher.instance.implicitView;
+    if (view == null) {
+      return const ui.Rect.fromLTWH(0, 0, 1, 1);
+    }
+    final size = view.physicalSize / view.devicePixelRatio;
+    return ui.Rect.fromLTWH(0, 0, size.width, size.height / 2);
   }
 
   Future<File?> _downloadShareImage(String url) async {

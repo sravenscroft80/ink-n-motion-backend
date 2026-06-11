@@ -15,6 +15,7 @@ import 'package:ink_n_motion/state/app_state.dart';
 import 'package:ink_n_motion/state/providers.dart';
 import 'package:ink_n_motion/utils/app_links.dart';
 import 'package:ink_n_motion/utils/design_tokens.dart';
+import 'package:ink_n_motion/utils/share_origin.dart';
 import 'package:ink_n_motion/utils/navigation.dart';
 import 'package:ink_n_motion/widgets/settings/settings_section_header.dart';
 import 'package:share_plus/share_plus.dart';
@@ -133,6 +134,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     await SharePlus.instance.share(
       ShareParams(
         text: kShareMessage,
+        sharePositionOrigin: shareOriginFromContext(context),
       ),
     );
   }

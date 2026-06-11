@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:ink_n_motion/services/firestore_wallet_service.dart';
 import 'package:ink_n_motion/utils/app_links.dart';
 import 'package:ink_n_motion/utils/gallery_media_saver.dart';
+import 'package:ink_n_motion/utils/share_origin.dart';
 import 'package:ink_n_motion/widgets/video/ink_network_video_player.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:ink_n_motion/screens/coverup_studio_picker.dart'
@@ -387,6 +388,7 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
     await SharePlus.instance.share(
       ShareParams(
         text: '${_videoUrl!}\n\n$kShareMessage',
+        sharePositionOrigin: shareOriginFromContext(context),
       ),
     );
   }

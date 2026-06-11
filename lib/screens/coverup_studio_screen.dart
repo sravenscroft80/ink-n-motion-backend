@@ -10,6 +10,7 @@ import 'package:ink_n_motion/services/firestore_wallet_service.dart';
 import 'package:ink_n_motion/utils/app_links.dart';
 import 'package:ink_n_motion/utils/concept_image_loader.dart';
 import 'package:ink_n_motion/utils/save_concept_image.dart';
+import 'package:ink_n_motion/utils/share_origin.dart';
 import 'package:ink_n_motion/screens/coverup_studio_picker.dart'
     if (dart.library.html) 'package:ink_n_motion/screens/coverup_studio_picker_web.dart'
     if (dart.library.io) 'package:ink_n_motion/screens/coverup_studio_picker_io.dart';
@@ -300,6 +301,7 @@ class _CoverupStudioScreenState extends State<CoverupStudioScreen>
       return;
     }
 
+    final origin = shareOriginFromContext(context);
     setState(() => _isSaving = true);
     try {
       final bytes = await loadConceptImageBytes(imageUrl);
@@ -319,9 +321,12 @@ class _CoverupStudioScreenState extends State<CoverupStudioScreen>
               mimeType: 'image/png',
             ),
           ],
+          sharePositionOrigin: origin,
         ),
       );
-    } catch (_) {
+    } catch (error, stackTrace) {
+      debugPrint('CoverupStudioScreen._shareImage failed: $error');
+      debugPrint('$stackTrace');
       if (mounted) {
         _showNotice('Unable to share image. Please try again.');
       }

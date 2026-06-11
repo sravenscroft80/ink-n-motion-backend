@@ -9,6 +9,7 @@ import 'package:ink_n_motion/services/firestore_wallet_service.dart';
 import 'package:ink_n_motion/utils/app_links.dart';
 import 'package:ink_n_motion/utils/concept_image_loader.dart';
 import 'package:ink_n_motion/utils/save_concept_image.dart';
+import 'package:ink_n_motion/utils/share_origin.dart';
 import 'package:share_plus/share_plus.dart';
 
 /// AI Concept Generator — single-prompt 2D tattoo concept renders.
@@ -204,9 +205,11 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
       return;
     }
 
+    final origin = shareOriginFromContext(context);
+
     if (kIsWeb) {
       await SharePlus.instance.share(
-        ShareParams(text: kShareMessage),
+        ShareParams(text: kShareMessage, sharePositionOrigin: origin),
       );
       return;
     }
@@ -229,9 +232,12 @@ class _AiCoachScreenState extends State<AiCoachScreen> {
               mimeType: 'image/png',
             ),
           ],
+          sharePositionOrigin: origin,
         ),
       );
-    } catch (_) {
+    } catch (error, stackTrace) {
+      debugPrint('AiCoachScreen._shareImage failed: $error');
+      debugPrint('$stackTrace');
       if (!mounted) return;
       _showNotice('Unable to share image. Please try again.');
     }
