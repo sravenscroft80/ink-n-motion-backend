@@ -65,11 +65,11 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyCFnNB1C11W-ymHzOxJypdP0OycACS29ek',
-    appId: '1:346440485421:ios:c084745c81af60deac86a4',
+    appId: '1:346440485421:ios:f63c55ebb2a45c37ac86a4',
     messagingSenderId: '346440485421',
     projectId: 'vibr-8c484',
     storageBucket: 'vibr-8c484.firebasestorage.app',
-    iosClientId: '346440485421-ul8j6kodpvoljrvr7pkc422ot9v71232.apps.googleusercontent.com',
-    iosBundleId: 'com.inknmotion.inkNMotion',
+    iosClientId: '346440485421-19tiambsq5chqahq53952r4sap421rsn.apps.googleusercontent.com',
+    iosBundleId: 'com.inknmotion.app',
   );
 }
