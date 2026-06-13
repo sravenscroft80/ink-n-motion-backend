@@ -127,6 +127,15 @@ class FirebaseAuthService {
       final auth = _authSafe;
       if (auth == null) return null;
 
+      if (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) {
+        final isAvailable = await SignInWithApple.isAvailable();
+        if (!isAvailable) {
+          throw StateError(
+            'Sign in with Apple is not available on this device.',
+          );
+        }
+      }
+
       final rawNonce = _generateNonce();
       final nonce = _sha256ofString(rawNonce);
 
@@ -138,8 +147,13 @@ class FirebaseAuthService {
         nonce: nonce,
       );
 
+      final identityToken = appleCredential.identityToken;
+      if (identityToken == null || identityToken.isEmpty) {
+        throw StateError('Apple Sign-In returned no identity token.');
+      }
+
       final oauthCredential = OAuthProvider('apple.com').credential(
-        idToken: appleCredential.identityToken,
+        idToken: identityToken,
         rawNonce: rawNonce,
       );
 
@@ -160,6 +174,17 @@ class FirebaseAuthService {
         await FirestoreWalletService.instance.initializeWallet(user.uid);
       }
       return user;
+    } on SignInWithAppleAuthorizationException catch (e, stackTrace) {
+      if (e.code == AuthorizationErrorCode.canceled) {
+        debugPrint('FirebaseAuthService.signInWithApple cancelled by user');
+        return null;
+      }
+      debugPrint(
+        'FirebaseAuthService.signInWithApple authorization failed: '
+        '${e.code} ${e.message}',
+      );
+      debugPrint('$stackTrace');
+      rethrow;
     } catch (e, stackTrace) {
       debugPrint('FirebaseAuthService.signInWithApple failed: $e');
       debugPrint('$stackTrace');
@@ -216,8 +241,10 @@ class FirebaseAuthService {
         return linked.user;
       } on FirebaseAuthException catch (e) {
         if (e.code == 'credential-already-in-use' ||
-            e.code == 'email-already-in-use') {
-          // Credential belongs to an existing account — sign into it instead.
+            e.code == 'email-already-in-use' ||
+            e.code == 'account-exists-with-different-credential') {
+          // Anonymous session can't be linked — sign into the existing account.
+          await auth.signOut();
           final signedIn = await auth.signInWithCredential(credential);
           return signedIn.user;
         }
