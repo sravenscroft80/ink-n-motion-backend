@@ -1,13 +1,16 @@
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ink_n_motion/screens/home_shell_screen.dart';
 import 'package:ink_n_motion/screens/onboarding_carousel_screen.dart';
+import 'package:ink_n_motion/services/firebase_auth_service.dart';
 import 'package:ink_n_motion/state/providers.dart';
 import 'package:ink_n_motion/utils/design_tokens.dart';
 import 'package:ink_n_motion/widgets/ink_neon_glow.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 /// Cupertino sign-in gate — Apple, Google, or continue as guest.
 class LoginScreen extends ConsumerStatefulWidget {
@@ -35,6 +38,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   void _showError(String message) {
+    debugPrint('LoginScreen sign-in error: $message');
     showCupertinoDialog<void>(
       context: context,
       builder: (ctx) => CupertinoAlertDialog(
@@ -51,6 +55,30 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
+  String _authErrorMessage(Object error, {required String providerLabel}) {
+    if (error is ExistingAccountSignInRequiredException) {
+      return error.userMessage;
+    }
+    if (error is FirebaseAuthException) {
+      final detail = error.message?.trim();
+      if (detail != null && detail.isNotEmpty) {
+        return '$providerLabel sign-in failed (${error.code}): $detail';
+      }
+      return '$providerLabel sign-in failed (${error.code})';
+    }
+    if (error is SignInWithAppleAuthorizationException) {
+      final detail = error.message.trim();
+      if (detail.isNotEmpty) {
+        return '$providerLabel authorization failed (${error.code.name}): $detail';
+      }
+      return '$providerLabel authorization failed (${error.code.name})';
+    }
+    if (error is StateError) {
+      return error.message;
+    }
+    return '$providerLabel sign-in failed: $error';
+  }
+
   Future<void> _handleAppleSignIn() async {
     if (_isLoading) return;
     setState(() => _isLoading = true);
@@ -60,9 +88,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       if (!mounted) return;
       if (user == null) return;
       await _navigateAfterAuth();
-    } catch (_) {
+    } catch (error, stackTrace) {
+      debugPrint('LoginScreen._handleAppleSignIn failed: $error');
+      debugPrint('$stackTrace');
       if (mounted) {
-        _showError('Unable to sign in with Apple. Please try again.');
+        _showError(_authErrorMessage(error, providerLabel: 'Apple'));
       }
     } finally {
       if (mounted) {
@@ -80,9 +110,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       if (!mounted) return;
       if (user == null) return;
       await _navigateAfterAuth();
-    } catch (_) {
+    } catch (error, stackTrace) {
+      debugPrint('LoginScreen._handleGoogleSignIn failed: $error');
+      debugPrint('$stackTrace');
       if (mounted) {
-        _showError('Unable to sign in with Google. Please try again.');
+        _showError(_authErrorMessage(error, providerLabel: 'Google'));
       }
     } finally {
       if (mounted) {

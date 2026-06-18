@@ -10,6 +10,44 @@ import 'package:ink_n_motion/firebase_options.dart';
 import 'package:ink_n_motion/services/firestore_wallet_service.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
+/// Thrown when a guest link hits an email registered with another provider.
+class ExistingAccountSignInRequiredException implements Exception {
+  const ExistingAccountSignInRequiredException({
+    this.email,
+    required this.existingProviders,
+  });
+
+  final String? email;
+  final List<String> existingProviders;
+
+  String get userMessage {
+    final labels = existingProviders.map(_providerLabel).toList();
+    if (labels.isEmpty) {
+      return 'account-exists-with-different-credential: An account already '
+          'exists for this email with a different sign-in method. Sign in with '
+          'that method first, then try again.';
+    }
+    final providerList = labels.length == 1
+        ? labels.first
+        : '${labels.sublist(0, labels.length - 1).join(', ')} or ${labels.last}';
+    return 'account-exists-with-different-credential: An account already '
+        'exists for this email. Sign in with $providerList first, then try again.';
+  }
+}
+
+String _providerLabel(String providerId) {
+  switch (providerId) {
+    case 'google.com':
+      return 'Google';
+    case 'apple.com':
+      return 'Apple';
+    case 'password':
+      return 'Email';
+    default:
+      return providerId;
+  }
+}
+
 /// Keeps auth sessions (anonymous or linked) and exposes ID tokens for API calls.
 class FirebaseAuthService {
   FirebaseAuthService({FirebaseAuth? auth, GoogleSignIn? googleSignIn})
@@ -240,12 +278,14 @@ class FirebaseAuthService {
         final linked = await current.linkWithCredential(credential);
         return linked.user;
       } on FirebaseAuthException catch (e) {
+        if (e.code == 'account-exists-with-different-credential') {
+          await _throwExistingAccountGuidance(auth, e);
+        }
         if (e.code == 'credential-already-in-use' ||
-            e.code == 'email-already-in-use' ||
-            e.code == 'account-exists-with-different-credential') {
-          // Anonymous session can't be linked — sign into the existing account.
+            e.code == 'email-already-in-use') {
+          final retryCredential = e.credential ?? credential;
           await auth.signOut();
-          final signedIn = await auth.signInWithCredential(credential);
+          final signedIn = await auth.signInWithCredential(retryCredential);
           return signedIn.user;
         }
         rethrow;
@@ -253,6 +293,28 @@ class FirebaseAuthService {
     }
     final signedIn = await auth.signInWithCredential(credential);
     return signedIn.user;
+  }
+
+  Future<void> _throwExistingAccountGuidance(
+    FirebaseAuth auth,
+    FirebaseAuthException error,
+  ) async {
+    final email = error.email;
+    var providers = <String>[];
+    if (email != null && email.isNotEmpty) {
+      try {
+        providers = await auth.fetchSignInMethodsForEmail(email);
+      } catch (fetchError, stackTrace) {
+        debugPrint(
+          'FirebaseAuthService: fetchSignInMethodsForEmail failed: $fetchError',
+        );
+        debugPrint('$stackTrace');
+      }
+    }
+    throw ExistingAccountSignInRequiredException(
+      email: email,
+      existingProviders: providers,
+    );
   }
 
   Future<String?> getIdToken({bool forceRefresh = false}) async {
