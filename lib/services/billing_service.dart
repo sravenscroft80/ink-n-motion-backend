@@ -213,7 +213,10 @@ abstract final class BillingService {
 
       if (products.isEmpty) {
         debugPrint('BillingService: product not found — $productId');
-        return PurchaseResult.productNotFound();
+        return PurchaseResult.productNotFound(
+          'Product "$productId" was not returned by the App Store. '
+          'Confirm it exists in App Store Connect and RevenueCat.',
+        );
       }
 
       final customerInfo =
@@ -225,15 +228,48 @@ abstract final class BillingService {
         debugPrint('BillingService: purchase cancelled for $productId');
         return PurchaseResult.cancelled();
       }
+      final message = _formatPurchaseError(errorCode, error, productId);
       debugPrint(
-        'BillingService: purchase failed for $productId — '
-        '${error.code}: ${error.message}',
+        'BillingService: purchase failed for $productId — $message',
       );
-      return PurchaseResult.error(error.message);
+      return PurchaseResult.error(message);
     } catch (error, stackTrace) {
       debugPrint('BillingService: unexpected purchase error — $error');
       debugPrint('$stackTrace');
-      return PurchaseResult.error('$error');
+      return PurchaseResult.error('Purchase failed for "$productId": $error');
+    }
+  }
+
+  static String _formatPurchaseError(
+    PurchasesErrorCode errorCode,
+    PlatformException error,
+    String productId,
+  ) {
+    final rcCode = errorCode.name;
+    final platformCode = error.code;
+    final detail = error.message?.trim();
+    final detailSuffix =
+        detail != null && detail.isNotEmpty ? ' — $detail' : '';
+
+    switch (errorCode) {
+      case PurchasesErrorCode.storeProblemError:
+        return 'App Store error ($rcCode/$platformCode)$detailSuffix';
+      case PurchasesErrorCode.purchaseNotAllowedError:
+        return 'Purchases are not allowed on this device ($rcCode)';
+      case PurchasesErrorCode.productNotAvailableForPurchaseError:
+        return 'Product "$productId" is not available for purchase ($rcCode). '
+            'Confirm it is Ready to Submit in App Store Connect and attached '
+            'to the submission.';
+      case PurchasesErrorCode.productAlreadyPurchasedError:
+        return 'You already own "$productId" ($rcCode). Try Restore Purchases.';
+      case PurchasesErrorCode.networkError:
+        return 'Network error during purchase ($rcCode)$detailSuffix';
+      case PurchasesErrorCode.receiptAlreadyInUseError:
+        return 'Receipt already in use ($rcCode)$detailSuffix';
+      case PurchasesErrorCode.invalidCredentialsError:
+        return 'RevenueCat credentials error ($rcCode)$detailSuffix';
+      default:
+        return 'Purchase failed for "$productId" ($rcCode/$platformCode)$detailSuffix';
     }
   }
 }

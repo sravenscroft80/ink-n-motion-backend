@@ -195,7 +195,17 @@ class FirebaseAuthService {
         rawNonce: rawNonce,
       );
 
-      final user = await _signInOrLinkCredential(auth, oauthCredential);
+      User? user;
+      try {
+        user = await _signInOrLinkCredential(auth, oauthCredential);
+      } on FirebaseAuthException catch (e, stackTrace) {
+        debugPrint(
+          'FirebaseAuthService.signInWithApple Firebase error: '
+          '${e.code} ${e.message}',
+        );
+        debugPrint('$stackTrace');
+        rethrow;
+      }
 
       if (user != null &&
           appleCredential.givenName != null &&
@@ -285,8 +295,17 @@ class FirebaseAuthService {
             e.code == 'email-already-in-use') {
           final retryCredential = e.credential ?? credential;
           await auth.signOut();
-          final signedIn = await auth.signInWithCredential(retryCredential);
-          return signedIn.user;
+          try {
+            final signedIn = await auth.signInWithCredential(retryCredential);
+            return signedIn.user;
+          } on FirebaseAuthException catch (retryError, stackTrace) {
+            debugPrint(
+              'FirebaseAuthService: guest→Apple retry failed — '
+              '${retryError.code} ${retryError.message}',
+            );
+            debugPrint('$stackTrace');
+            rethrow;
+          }
         }
         rethrow;
       }

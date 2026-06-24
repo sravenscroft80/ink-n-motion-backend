@@ -72,9 +72,10 @@ class _PaywallCreditPurchaseScreenState
         unawaited(
           _showPurchaseAlert(
             title: 'Product Unavailable',
-            message:
-                'This item is not available in the store yet. '
-                'Try again later or contact support@ink-n-motion.com.',
+            message: result.message?.isNotEmpty == true
+                ? result.message!
+                : 'This item is not available in the store yet. '
+                    'Try again later or contact support@ink-n-motion.com.',
           ),
         );
       case PurchaseOutcome.creditFailed:
