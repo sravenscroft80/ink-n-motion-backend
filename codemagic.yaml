@@ -61,7 +61,10 @@ workflows:
 
       - name: Build iOS IPA
         script: |
-          flutter build ipa --release --dart-define-from-file=config/app.env
+          xcode-project use-profiles
+          flutter build ipa --release \
+            --dart-define-from-file=config/app.env \
+            --export-options-plist=/Users/builder/export_options.plist
 
       - name: Verify signed entitlements (SIWA)
         script: |
