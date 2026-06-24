@@ -45,20 +45,13 @@ workflows:
           app-store-connect fetch-signing-files "$BUNDLE_ID" \
             --platform IOS \
             --type IOS_APP_STORE \
-            --certificate-key=@env:CM_CERTIFICATE \
             --create \
             --delete-stale-profiles \
-            --strict-match-identifier || \
-          app-store-connect fetch-signing-files "$BUNDLE_ID" \
-            --platform IOS \
-            --type IOS_APP_STORE \
-            --create \
             --strict-match-identifier
           keychain add-certificates
           xcode-project use-profiles
           echo "=== Installed provisioning profiles ==="
           ls -la "$HOME/Library/MobileDevice/Provisioning Profiles/" || echo "NONE FOUND"
-          /usr/libexec/PlistBuddy -c 'Print' ios/Runner/Runner.entitlements
 
       - name: Build iOS IPA
         script: |
