@@ -83,24 +83,24 @@ class PaywallTier {
     grantsPremium: true,
   );
 
-  /// $14.99/mo · 110 tokens · sweet spot subscription.
+  /// $14.99/mo · 100 tokens · sweet spot subscription.
   static const flowMonthly = PaywallTier(
     id: PaywallTierId.flowMonthly,
     title: 'Ink Flow',
     priceLabel: '\$14.99/mo',
-    subtitle: '110 tokens / month · best value',
-    creditsGranted: 110,
+    subtitle: '100 tokens / month · best value',
+    creditsGranted: 100,
     grantsPremium: true,
     badge: PaywallBadge.mostPopular,
   );
 
-  /// $24.99/mo · 300 tokens · studio/artist tier with directory badge.
+  /// $24.99/mo · 200 tokens · studio/artist tier with directory badge.
   static const studioMonthly = PaywallTier(
     id: PaywallTierId.studioMonthly,
     title: 'Ink Studio',
     priceLabel: '\$24.99/mo',
-    subtitle: '300 tokens / month · Artist Directory badge (beta)',
-    creditsGranted: 300,
+    subtitle: '200 tokens / month · Artist Directory badge (beta)',
+    creditsGranted: 200,
     grantsPremium: true,
     badge: PaywallBadge.artistDirectory,
   );

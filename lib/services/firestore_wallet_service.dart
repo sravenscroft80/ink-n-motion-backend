@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 /// Token costs for each feature — single source of truth.
 abstract final class InkTokenCost {
-  static const int animateMyInk = 10; // 10-second animation
+  static const int animateMyInk = 15; // 10-second animation
   static const int coverupStudio = 3; // AI coverup render
   static const int aiConcept = 1; // AI concept sketch
 }
@@ -261,9 +261,9 @@ class FirestoreWalletService {
       case 'spark':
         return 50;
       case 'flow':
-        return 110;
+        return 100;
       case 'studio':
-        return 300;
+        return 200;
       default:
         return 0;
     }

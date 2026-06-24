@@ -584,7 +584,7 @@ class _CreditsInfoCard extends StatelessWidget {
 
   static const _lines = [
     '1 AI Concept Render = 1 token (1 free per day)',
-    '10-Second Animation = 10 tokens',
+    '10-Second Animation = 15 tokens',
     'Coverup Studio Render = 3 tokens',
   ];
 

@@ -213,7 +213,7 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
 
     if (wallet.totalBalance < InkTokenCost.animateMyInk) {
       _showNotice(
-        'You need 10 tokens to animate. Visit the store to top up.',
+        'You need 15 tokens to animate. Visit the store to top up.',
         title: 'Not Enough Tokens',
       );
       return;
@@ -760,7 +760,7 @@ class _AnimateMyInkScreenState extends State<AnimateMyInkScreen> {
                       Icon(CupertinoIcons.sparkles, color: _gold, size: 14),
                       SizedBox(width: 6),
                       Text(
-                        '10 tokens per render',
+                        '15 tokens per render',
                         style: TextStyle(
                           color: _gold,
                           fontSize: 12,

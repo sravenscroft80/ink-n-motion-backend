@@ -33,16 +33,16 @@ class AppState {
   });
 
   // Token costs — aligned with token_constants.dart
-  // 5s render = 5 tokens, 10s render = 10 tokens
-  static const int kPremiumCreditCost = 5;
-  static const int kPremiumCreditCostTenSecond = 10;
+  // 5s render = 8 tokens, 10s render = 15 tokens
+  static const int kPremiumCreditCost = 8;
+  static const int kPremiumCreditCostTenSecond = 15;
   static const int premiumGenerationCreditCost = kPremiumCreditCost;
 
   /// Credits restored on an approved rolling-window refund.
   static const int refundCreditsRestored = kPremiumCreditCost;
 
   /// Premium subscribers may render up to this many premium videos per cycle.
-  static const int premiumMonthlyRenderCap = 30;
+  static const int premiumMonthlyRenderCap = 25;
 
   /// Free users may run this many easy renders per calendar day.
   static const int freeEasyRendersPerDay = 2;

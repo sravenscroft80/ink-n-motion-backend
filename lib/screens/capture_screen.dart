@@ -743,7 +743,7 @@ class _CaptureScreenState extends ConsumerState<CaptureScreen> {
                           const SizedBox(width: 4),
 
                           Text(
-                            '10 tokens',
+                            '15 tokens',
                             style: InkTypography.caption1.copyWith(
                               color: InkColors.accentGold,
                               fontWeight: FontWeight.w700,

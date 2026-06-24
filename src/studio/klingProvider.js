@@ -91,6 +91,7 @@ async function submitKlingJob({ imageUrl, durationSeconds = 5, stylePrompt = '' 
     image,
     prompt: stylePrompt || 'cinematic tattoo animation, flowing ink movement',
     duration: String(durationSeconds),
+    resolution: '1080p',
     cfg_scale: 0.5,
     mode: 'pro',
     negative_prompt:

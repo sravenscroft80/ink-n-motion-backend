@@ -17,8 +17,8 @@ abstract final class BillingProductIds {
 
   // ─── Monthly subscriptions ───────────────────────────────────────────────
   static const String sparkMonthly = 'ink_spark_monthly'; // $8.99/mo  · 50 tokens
-  static const String flowMonthly = 'ink_flow_monthly'; // $14.99/mo · 110 tokens
-  static const String studioMonthly = 'ink_studio_monthly'; // $24.99/mo · 300 tokens
+  static const String flowMonthly = 'ink_flow_monthly'; // $14.99/mo · 100 tokens
+  static const String studioMonthly = 'ink_studio_monthly'; // $24.99/mo · 200 tokens
 
   /// Maps a product ID → token grant for local wallet credit after purchase.
   static int tokensForProduct(String productId) {
@@ -32,9 +32,9 @@ abstract final class BillingProductIds {
       case sparkMonthly:
         return 50;
       case flowMonthly:
-        return 110;
+        return 100;
       case studioMonthly:
-        return 300;
+        return 200;
       default:
         return 0;
     }
