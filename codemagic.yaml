@@ -62,6 +62,7 @@ workflows:
       - name: Build iOS IPA
         script: |
           xcode-project use-profiles
+          sed -i '' 's/CODE_SIGN_STYLE = Automatic/CODE_SIGN_STYLE = Manual/g' ios/Runner.xcodeproj/project.pbxproj
           flutter build ipa --release \
             --dart-define-from-file=config/app.env \
             --export-options-plist=/Users/builder/export_options.plist
