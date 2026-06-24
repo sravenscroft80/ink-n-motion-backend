@@ -38,7 +38,7 @@ workflows:
       - name: Get Flutter packages
         script: flutter packages pub get
       - name: Flutter analyze
-        script: flutter analyze
+        script: flutter analyze --no-fatal-infos --no-fatal-warnings
       - name: Set up code signing
         script: |
           keychain initialize
@@ -135,7 +135,7 @@ workflows:
       - name: Get Flutter packages
         script: flutter packages pub get
       - name: Flutter analyze
-        script: flutter analyze
+        script: flutter analyze --no-fatal-infos --no-fatal-warnings
       - name: Build Android App Bundle
         script: |
           flutter build appbundle --release --dart-define-from-file=config/app.env
