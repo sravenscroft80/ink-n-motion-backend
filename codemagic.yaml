@@ -41,13 +41,46 @@ workflows:
         script: |
           keychain initialize
           app-store-connect create-certificate --type IOS_DISTRIBUTION --save || true
-          app-store-connect fetch-signing-files "com.inknmotion.app" --type IOS_APP_STORE --create
+          # Regenerate App Store profile so Sign in with Apple + IAP capabilities
+          # from App ID com.inknmotion.app are embedded (build 8 profile may predate SIWA).
+          app-store-connect fetch-signing-files "$BUNDLE_ID" \
+            --type IOS_APP_STORE \
+            --create \
+            --delete-stale-profiles \
+            --strict-match-identifier
           keychain add-certificates
           xcode-project use-profiles
+          echo "=== Runner.entitlements (source) ==="
+          /usr/libexec/PlistBuddy -c 'Print' ios/Runner/Runner.entitlements
+          if ! /usr/libexec/PlistBuddy -c 'Print :com.apple.developer.applesignin:0' ios/Runner/Runner.entitlements 2>/dev/null | grep -q Default; then
+            echo "ERROR: Runner.entitlements missing com.apple.developer.applesignin = Default"
+            exit 1
+          fi
 
       - name: Build iOS IPA
         script: |
           flutter build ipa --release --dart-define-from-file=config/app.env
+
+      - name: Verify signed entitlements (SIWA)
+        script: |
+          IPA=$(find "$CM_BUILD_DIR/build/ios/ipa" -name '*.ipa' | head -1)
+          if [ -z "$IPA" ]; then
+            echo "ERROR: No IPA artifact found"
+            exit 1
+          fi
+          rm -rf /tmp/ipa_entitlements_check
+          mkdir -p /tmp/ipa_entitlements_check
+          unzip -q -o "$IPA" -d /tmp/ipa_entitlements_check
+          APP="/tmp/ipa_entitlements_check/Payload/Runner.app"
+          codesign -d --entitlements :- "$APP" > /tmp/Runner.entitlements.xml
+          echo "=== Signed Runner.app entitlements ==="
+          cat /tmp/Runner.entitlements.xml
+          if ! grep -q 'com.apple.developer.applesignin' /tmp/Runner.entitlements.xml; then
+            echo "ERROR: Signed IPA missing com.apple.developer.applesignin — provisioning profile likely stale."
+            echo "Confirm App ID has Sign in with Apple enabled, then re-run this workflow."
+            exit 1
+          fi
+          echo "OK: Sign in with Apple entitlement present in signed IPA"
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log

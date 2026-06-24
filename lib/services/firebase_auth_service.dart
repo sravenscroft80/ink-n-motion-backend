@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:crypto/crypto.dart';
@@ -161,17 +162,21 @@ class FirebaseAuthService {
   }
 
   Future<User?> signInWithApple() async {
+    if (kIsWeb || !Platform.isIOS) {
+      throw UnsupportedError(
+        'Sign in with Apple is only supported on iOS using the native flow.',
+      );
+    }
+
     try {
       final auth = _authSafe;
       if (auth == null) return null;
 
-      if (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) {
-        final isAvailable = await SignInWithApple.isAvailable();
-        if (!isAvailable) {
-          throw StateError(
-            'Sign in with Apple is not available on this device.',
-          );
-        }
+      final isAvailable = await SignInWithApple.isAvailable();
+      if (!isAvailable) {
+        throw StateError(
+          'Sign in with Apple is not available on this device.',
+        );
       }
 
       final rawNonce = _generateNonce();

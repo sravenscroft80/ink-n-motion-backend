@@ -1,11 +1,14 @@
 import 'dart:async';
 
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ink_n_motion/screens/home_shell_screen.dart';
 import 'package:ink_n_motion/screens/onboarding_carousel_screen.dart';
+import 'package:ink_n_motion/services/billing_service.dart';
 import 'package:ink_n_motion/services/firebase_auth_service.dart';
 import 'package:ink_n_motion/state/providers.dart';
 import 'package:ink_n_motion/utils/design_tokens.dart';
@@ -79,6 +82,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return '$providerLabel sign-in failed: $error';
   }
 
+  Future<void> _linkBillingAfterAuth(FirebaseAuthService authService) async {
+    final uid = authService.uid;
+    if (uid == null || uid.isEmpty) return;
+    try {
+      await BillingService.linkToFirebaseUser(uid);
+    } catch (error, stackTrace) {
+      debugPrint('LoginScreen: RevenueCat link failed: $error');
+      debugPrint('$stackTrace');
+    }
+  }
+
   Future<void> _handleAppleSignIn() async {
     if (_isLoading) return;
     setState(() => _isLoading = true);
@@ -87,6 +101,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       final user = await authService.signInWithApple();
       if (!mounted) return;
       if (user == null) return;
+      await _linkBillingAfterAuth(authService);
       await _navigateAfterAuth();
     } catch (error, stackTrace) {
       debugPrint('LoginScreen._handleAppleSignIn failed: $error');
@@ -109,6 +124,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       final user = await authService.signInWithGoogle();
       if (!mounted) return;
       if (user == null) return;
+      await _linkBillingAfterAuth(authService);
       await _navigateAfterAuth();
     } catch (error, stackTrace) {
       debugPrint('LoginScreen._handleGoogleSignIn failed: $error');
@@ -144,7 +160,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final showAppleButton = !kIsWeb;
+    final showAppleButton = !kIsWeb && Platform.isIOS;
 
     return CupertinoPageScaffold(
       backgroundColor: InkColors.backgroundPrimary,
