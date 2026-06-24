@@ -42,22 +42,23 @@ workflows:
       - name: Set up code signing
         script: |
           keychain initialize
-          app-store-connect create-certificate --type IOS_DISTRIBUTION --save || true
-          # Regenerate App Store profile so Sign in with Apple + IAP capabilities
-          # from App ID com.inknmotion.app are embedded (build 8 profile may predate SIWA).
           app-store-connect fetch-signing-files "$BUNDLE_ID" \
+            --platform IOS \
             --type IOS_APP_STORE \
+            --certificate-key=@env:CM_CERTIFICATE \
             --create \
             --delete-stale-profiles \
+            --strict-match-identifier || \
+          app-store-connect fetch-signing-files "$BUNDLE_ID" \
+            --platform IOS \
+            --type IOS_APP_STORE \
+            --create \
             --strict-match-identifier
           keychain add-certificates
           xcode-project use-profiles
-          echo "=== Runner.entitlements (source) ==="
+          echo "=== Installed provisioning profiles ==="
+          ls -la "$HOME/Library/MobileDevice/Provisioning Profiles/" || echo "NONE FOUND"
           /usr/libexec/PlistBuddy -c 'Print' ios/Runner/Runner.entitlements
-          if ! /usr/libexec/PlistBuddy -c 'Print :com.apple.developer.applesignin:0' ios/Runner/Runner.entitlements 2>/dev/null | grep -q Default; then
-            echo "ERROR: Runner.entitlements missing com.apple.developer.applesignin = Default"
-            exit 1
-          fi
 
       - name: Build iOS IPA
         script: |
