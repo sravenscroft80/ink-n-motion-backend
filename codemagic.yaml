@@ -6,6 +6,9 @@ workflows:
     integrations:
       app_store_connect: Codemagic_AstroDots
     environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.inknmotion.app
       groups:
         - app_env
       vars:
@@ -41,14 +44,6 @@ workflows:
         script: flutter analyze --no-fatal-infos --no-fatal-warnings
       - name: Set up code signing
         script: |
-          keychain initialize
-          app-store-connect fetch-signing-files "$BUNDLE_ID" \
-            --platform IOS \
-            --type IOS_APP_STORE \
-            --create \
-            --delete-stale-profiles \
-            --strict-match-identifier
-          keychain add-certificates
           xcode-project use-profiles
           echo "=== Installed provisioning profiles ==="
           ls -la "$HOME/Library/MobileDevice/Provisioning Profiles/" || echo "NONE FOUND"
